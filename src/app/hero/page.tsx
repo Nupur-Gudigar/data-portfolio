@@ -31,6 +31,8 @@ const projects = [
     description:
       "An end-to-end data engineering pipeline that loads real Medicare Part D claims data into Snowflake, transforms it with dbt across three layers, and applies Isolation Forest machine learning to surface the top 0.5% of statistically suspicious prescribers across 20,935 providers nationwide.",
     gif: "/images/projects/cms-anomaly.gif",
+    mp4: "/images/projects/cms-anomaly.mp4",
+    poster: "/images/projects/cms-anomaly-poster.jpg",
     github: "https://github.com/Nupur-Gudigar/cms-anomaly-pipeline",
     live: "https://nupur-gudigar.github.io/cms-anomaly-pipeline/",
     domain: "Healthcare Analytics",
