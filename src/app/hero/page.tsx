@@ -1,14 +1,12 @@
 "use client";
 
 import {
-  Fragment,
   memo,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -29,6 +27,26 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const projects = [
   {
+    title: "Detecting Anomalous Prescriber Billing Patterns",
+    description:
+      "An end-to-end data engineering pipeline that loads real Medicare Part D claims data into Snowflake, transforms it with dbt across three layers, and applies Isolation Forest machine learning to surface the top 0.5% of statistically suspicious prescribers across 20,935 providers nationwide.",
+    gif: "/images/projects/cms-anomaly.gif",
+    github: "https://github.com/Nupur-Gudigar/cms-anomaly-pipeline",
+    live: "https://nupur-gudigar.github.io/cms-anomaly-pipeline/",
+    domain: "Healthcare Analytics",
+    techStack: ["Snowflake", "dbt", "Apache Airflow", "Python", "Isolation Forest", "Great Expectations"],
+    tags: [
+      "https://img.shields.io/badge/Snowflake-29B5E8?style=flat-square&logo=snowflake&logoColor=white",
+      "https://img.shields.io/badge/dbt-FF694B?style=flat-square&logo=dbt&logoColor=white",
+      "https://img.shields.io/badge/Apache%20Airflow-017CEE?style=flat-square&logo=apacheairflow&logoColor=white",
+      "https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white",
+      "https://img.shields.io/badge/Isolation%20Forest-533AB7?style=flat-square",
+      "https://img.shields.io/badge/Great%20Expectations-FF694B?style=flat-square",
+      "https://img.shields.io/badge/CMS%20Medicare-185FA5?style=flat-square",
+      "https://img.shields.io/badge/Anomaly%20Detection-993C1D?style=flat-square",
+    ],
+  },
+  {
     title: "Olympic Figure Skating Data Analysis (2006–2026)",
     description:
       "This end-to-end analysis of Olympic figure skating (2006–2026) quantifies the balance between technical and artistic performance using a custom 'tech dominance' metric. I built the dataset from scratch and used Python and interactive visuals to reveal how scoring trends have evolved over time.",
@@ -37,6 +55,8 @@ const projects = [
     poster: "/images/projects/new-skating-poster.jpg",
     github: "https://github.com/Nupur-Gudigar/olympic-skating-analysis",
     live: "https://nupur-gudigar.github.io/olympic-skating-analysis/",
+    domain: "Sports Analytics",
+    techStack: ["Python", "Pandas", "Plotly", "Jupyter", "EDA", "Custom Metrics", "Dataset Creation"],
     tags: [
       "https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white",
       "https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white",
@@ -61,6 +81,8 @@ const projects = [
     poster: "/images/projects/spintember-poster.jpg",
     github: "https://github.com/Nupur-Gudigar/Spintember",
     live: "https://nupur-gudigar.github.io/Spintember/",
+    domain: "Creative Dev",
+    techStack: ["React", "Electron", "Vite", "Redux Toolkit", "JavaScript", "Node.js"],
     tags: [
       "https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB",
       "https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white",
@@ -81,6 +103,8 @@ const projects = [
     poster: "/images/projects/hear-screen-poster.jpg",
     github: "https://github.com/Nupur-Gudigar/Heart-Screen",
     live: "https://nupur-gudigar.github.io/Heart-Screen/",
+    domain: "Creative Coding",
+    techStack: ["p5.js", "JavaScript", "Generative Art", "HTML5", "CSS3"],
     tags: [
       "https://img.shields.io/badge/p5.js-ED225D?style=flat-square&logo=p5dotjs&logoColor=white",
       "https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=333",
@@ -100,6 +124,8 @@ const projects = [
     poster: "/images/projects/kirby-poster.jpg",
     github: "https://github.com/Nupur-Gudigar/Kirby_Visualizer",
     live: "https://nupur-gudigar.github.io/Kirby_Visualizer/",
+    domain: "Audio / Creative",
+    techStack: ["p5.js", "p5.sound", "JavaScript", "FFT", "Audio Visualization"],
     tags: [
       "https://img.shields.io/badge/p5.js-ED225D?style=flat-square&logo=p5dotjs&logoColor=white",
       "https://img.shields.io/badge/p5.sound-B5154B?style=flat-square",
@@ -119,6 +145,8 @@ const projects = [
     poster: "/images/projects/youtube-stats-poster.jpg",
     github: "https://github.com/Nupur-Gudigar/youtube-analysis",
     live: "https://colab.research.google.com/github/Nupur-Gudigar/youtube-analysis/blob/main/Visualize_Youtube_Data_with_Plotly.ipynb",
+    domain: "Data Analytics",
+    techStack: ["Python", "Pandas", "Plotly", "Jupyter", "EDA"],
     tags: [
       "https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white",
       "https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white",
@@ -148,7 +176,7 @@ const SIDEBAR_STICKERS = [
 ] as const;
 const SIDEBAR_REPEAT_COUNT = 18;
 const SIDEBAR_ROTATION = [-8, 5, -4, 7, -6, 4, -5, 8, -7, 3, -6, 6] as const;
-const SIDEBAR_WIDTH = [56, 58, 54, 60, 57, 62, 56, 59, 54, 60, 57, 61] as const;
+const SIDEBAR_WIDTH = [44, 46, 42, 48, 45, 50, 44, 47, 42, 48, 45, 49] as const;
 const SIDEBAR_X_SHIFT = [-3, 2, -1, 3, -2, 2, -1, 3, -3, 1, -2, 2] as const;
 const SIDEBAR_GAP = [8, 10, 6, 12, 8, 10, 7, 11, 7, 10, 8, 12] as const;
 
@@ -226,42 +254,6 @@ const bioParagraphs = [
   "Outside of work, I'm a gamer at heart which honestly explains a lot. Good design, smooth systems, intuitive experiences I care about all of it, probably more than I should.",
 ] as const;
 
-/** Desktop experience grid: Chicago Public Schools (photo left, card right). */
-const CPS_TOP = 1100;
-/** Job card / date / connector sit below the photo stamp for horizontal breathing room. */
-const CPS_JOB_TOP = CPS_TOP + 72;
-const CPS_CARD_H = 260;
-const CPS_DESC_TOP = CPS_JOB_TOP + 340;
-const CPS_CONNECTOR_TOP = CPS_JOB_TOP + CPS_CARD_H / 2 - 1;
-
-/** Desktop experience grid: Data Science Consultant (job card left, photo right). */
-const DS_TOP = 2250;
-const DS_JOB_TOP = DS_TOP;
-const DS_CONNECTOR_TOP = DS_JOB_TOP + 129;
-const DS_DESC_TOP = DS_JOB_TOP + 320;
-
-/** Desktop experience grid: Infosys (photo left, job cards right — CPS-style). */
-const INF_TOP = 3500;
-const INF_JOB_TOP = INF_TOP;
-const INF_CONNECTOR_TOP = INF_JOB_TOP + 231;
-const INF_DESC_TOP = INF_JOB_TOP + 480;
-
-/** Shared inline style for date pills at timeline × connector junction (desktop lg). */
-const experienceDateBadgeBaseStyle: CSSProperties = {
-  position: "absolute",
-  left: 728,
-  transform: "translateX(-50%)",
-  zIndex: 5,
-  backgroundColor: "#400909",
-  color: "#ffffff",
-  borderRadius: 999,
-  padding: "6px 20px",
-  fontSize: 18,
-  fontWeight: 800,
-  fontStyle: "italic",
-  fontFamily: "var(--font-nunito), Nunito Sans, system-ui, sans-serif",
-  whiteSpace: "nowrap",
-};
 
 const dataScienceConsultantDescriptionFirstParagraph =
   "As a Data Science Consultant during my summer internship, I worked on an e-learning platform exploring how data can drive user engagement and product decisions.";
@@ -460,12 +452,12 @@ function BeyondResumeSection() {
           </p>
         </div>
 
-        <div className="mt-6 grid min-w-0 grid-cols-1 items-start gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="min-w-0 rounded-[16px] border-[3px] border-[#1a1a1a] bg-[#FAF0DC] p-4 shadow-[4px_4px_0_#1a1a1a] md:p-5">
+        <div className="mt-6 grid min-w-0 grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="flex min-w-0 flex-col rounded-[16px] border-[3px] border-[#1a1a1a] bg-[#FAF0DC] p-4 shadow-[4px_4px_0_#1a1a1a] md:p-5">
             <span className="inline-block rounded bg-[#E8635A] px-3 py-1 font-mono text-[13px] font-bold text-[#FAF0DC]">
               places i&apos;ve been
             </span>
-            <div className="relative mt-3 w-full max-w-full overflow-hidden rounded-[10px] bg-[#FAF0DC]">
+            <div className="relative mt-3 overflow-hidden rounded-[10px] bg-[#FAF0DC]">
               <svg
                 viewBox={`0 0 ${width} ${height}`}
                 className="h-auto w-full max-w-full"
@@ -541,10 +533,35 @@ function BeyondResumeSection() {
             <p className="mt-2 font-mono text-[11px] italic text-[#666]">
               {hoveredCity ?? "hover over a pin to see the city"}
             </p>
-            <p className="mt-1 font-mono text-[11px] text-[#666]">
-              n = {beyondResumeCities.length} cities · data collection ongoing
-            </p>
-            <p className="mt-0.5 font-mono text-[11px] text-[#666]">
+
+            <div className="mt-4 flex-1 rounded-[10px] border border-[#1a1a1a]/10 bg-[#f0ead6] p-3">
+              <p className="mb-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#999]">
+                cities logged
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {beyondResumeCities.map((city) => (
+                  <span
+                    key={city.name}
+                    className="inline-flex items-center gap-1 rounded px-2 py-1 font-mono text-[10px]"
+                    style={
+                      city.isCurrent
+                        ? { background: "#1a1a1a", color: "#FAF0DC", fontWeight: 700 }
+                        : { border: "1px solid rgba(26,26,26,0.18)", color: "#555" }
+                    }
+                  >
+                    {city.isCurrent && (
+                      <span style={{ fontSize: 8 }}>★</span>
+                    )}
+                    {city.name}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 font-mono text-[9px] text-[#aaa]">
+                n = {beyondResumeCities.length} · data collection ongoing
+              </p>
+            </div>
+
+            <p className="mt-3 font-mono text-[11px] text-[#666]">
               data gathered from: Nupur&apos;s Life · source: her phone
             </p>
           </div>
@@ -615,299 +632,129 @@ function BeyondResumeSection() {
   );
 }
 
-function ProjectCarousel() {
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState<1 | -1>(1);
-  const [failedMp4s, setFailedMp4s] = useState<Record<string, boolean>>({});
-  const total = projects.length;
-  const prev = () => {
-    setDirection(-1);
-    setCurrent((c) => (c - 1 + total) % total);
-  };
-  const next = () => {
-    setDirection(1);
-    setCurrent((c) => (c + 1) % total);
-  };
-  const goToSlide = (i: number) => {
-    if (i === current) return;
-    setDirection(i > current ? 1 : -1);
-    setCurrent(i);
-  };
-  const project = projects[current];
-  const shouldUseVideo = Boolean(project.mp4) && !failedMp4s[project.title];
+function ProjectCard({ project }: { project: (typeof projects)[0] }) {
+  const [failedMp4, setFailedMp4] = useState(false);
+  const shouldUseVideo = Boolean(project.mp4) && !failedMp4;
   const fallbackMedia = project.poster ?? project.gif;
-  const hasFunFact = project.description.includes("Fun Fact:");
-  const useCompactMobileCopy = hasFunFact || project.description.length > 290;
-  const isOlympicProject = project.title.includes("Olympic Figure Skating");
-  const isKirbyProject = project.title.includes("Kirby Music Visualizer");
-  const isYoutubeProject = project.title.includes("Visualizing YouTube Data");
-  const isHeartScreenProject = project.title.includes("Heart Screen");
-
-  useEffect(() => {
-    projects.forEach((p) => {
-      const previewSrc = p.poster ?? p.gif;
-      if (!previewSrc) return;
-      const img = new window.Image();
-      img.src = previewSrc;
-    });
-  }, []);
-
-  if (total === 0) return null;
-
-  const navBtnMobileClass =
-    "z-10 flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 text-xl text-white shadow-md transition active:scale-95 lg:hidden";
-  const navBtnMobileStyle: React.CSSProperties = { backgroundColor: "#400909" };
-
-  const desktopNavBtnStyle: React.CSSProperties = {
-    position: "absolute",
-    top: "35%",
-    transform: "translateY(-50%)",
-    backgroundColor: "#400909",
-    color: "white",
-    border: "none",
-    borderRadius: 999,
-    width: 48,
-    height: 48,
-    fontSize: 20,
-    cursor: "pointer",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-  };
 
   return (
-    <div className="relative mx-auto mt-10 w-full max-w-[1200px] px-3 pb-16 sm:px-5 sm:pb-20 md:px-8 lg:px-[60px] lg:pb-0">
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-10">
-        <div className="relative mx-auto w-full max-w-[1100px]">
-          <button
-            type="button"
-            aria-label="Previous project"
-            onClick={prev}
-            className="hidden items-center justify-center lg:flex"
-            style={{ ...desktopNavBtnStyle, left: -60 }}
-          >
-            ←
-          </button>
-
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={current}
-              custom={direction}
-              initial={{ opacity: 0, x: direction * 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -40 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="flex w-full min-w-0 max-w-full flex-col items-center gap-10"
-            >
-              <div className="relative mx-auto w-full min-w-0 max-w-[1100px]">
-                <button
-                  type="button"
-                  aria-label="Previous project"
-                  onClick={prev}
-                  className={`${navBtnMobileClass} absolute left-2 top-1/2 -translate-y-1/2`}
-                  style={navBtnMobileStyle}
-                >
-                  ←
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next project"
-                  onClick={next}
-                  className={`${navBtnMobileClass} absolute right-2 top-1/2 -translate-y-1/2`}
-                  style={navBtnMobileStyle}
-                >
-                  →
-                </button>
-                <div
-                  className="mx-auto w-full min-w-0 max-w-[1100px]"
-                  style={{
-                    borderRadius: 12,
-                    overflow: "hidden",
-                    border: "3px solid #1e1e1e",
-                    backgroundColor: "#000",
-                  }}
-                >
-                  {shouldUseVideo ? (
-                    <video
-                      src={project.mp4}
-                      poster={project.poster}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="metadata"
-                      onError={() =>
-                        setFailedMp4s((prev) => ({ ...prev, [project.title]: true }))
-                      }
-                      style={{ width: "100%", height: "auto", display: "block" }}
-                    />
-                  ) : fallbackMedia ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={fallbackMedia}
-                      alt={project.title}
-                      style={{ width: "100%", height: "auto", display: "block" }}
-                    />
-                  ) : (
-                    <div
-                      className="flex items-center justify-center px-6 py-20 text-center text-white"
-                      style={{ backgroundColor: "#111" }}
-                    >
-                      Media preview unavailable
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div
-                className="flex w-full min-w-0 max-w-[1100px] flex-col items-stretch justify-center gap-10 lg:flex-row lg:items-stretch"
-                style={{ gap: 40, maxWidth: 1100 }}
-              >
-                <div
-                  className="flex min-w-0 flex-1 flex-col items-center lg:items-start"
-                  style={{ gap: 16 }}
-                >
-                  <h3
-                    className="m-0 w-full max-w-full text-balance break-words text-center text-[clamp(1.15rem,4.2vw,1.75rem)] font-extrabold italic leading-tight text-white lg:text-left lg:text-[28px]"
-                    style={{
-                      fontFamily:
-                        "var(--font-nunito), Nunito Sans, system-ui, sans-serif",
-                    }}
-                  >
-                    {project.title}
-                  </h3>
-                  <div className="flex flex-wrap justify-center lg:justify-start">
-                    {project.tags.map((badgeUrl, i) => (
-                      <Fragment key={i}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={badgeUrl}
-                          alt=""
-                          className="mb-1 mr-1 inline-block h-[22px]"
-                        />
-                      </Fragment>
-                    ))}
-                  </div>
-                  <div
-                    className="flex flex-wrap justify-center gap-3 lg:justify-start"
-                    style={{ marginTop: 4 }}
-                  >
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full bg-[#1e1e1e] px-7 py-3 text-[15px] font-extrabold italic text-white no-underline transition-transform duration-200 hover:-translate-y-0.5"
-                    >
-                      <svg
-                        aria-hidden
-                        className="h-5 w-5 shrink-0"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                      </svg>
-                      GitHub
-                    </a>
-                    <a
-                      href={project.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border-[3px] border-[#1e1e1e] bg-white px-7 py-3 text-[15px] font-extrabold italic text-[#1e1e1e] no-underline transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1e1e1e] hover:text-white"
-                    >
-                      <span aria-hidden className="text-base leading-none">
-                        ▶
-                      </span>
-                      Live Site
-                    </a>
-                  </div>
-                </div>
-
-                <div
-                  className={`mx-auto w-full max-w-[580px] shrink-0 ${
-                    useCompactMobileCopy ? "min-h-[260px]" : ""
-                  } lg:mx-0 lg:min-h-0 lg:h-[245px] lg:w-[580px] lg:max-w-full`}
-                  style={{
-                    flexShrink: 0,
-                    backgroundImage: "url('/images/Component_14.svg')",
-                    backgroundSize: "100% 100%",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  <div
-                    className={`flex h-full items-start justify-center ${
-                      isOlympicProject
-                        ? "px-9 pb-[40px] pt-[116px]"
-                        : isHeartScreenProject
-                          ? "px-8 pb-8 pt-[108px]"
-                        : isYoutubeProject
-                          ? "px-9 pb-[40px] pt-[60px]"
-                        : isKirbyProject
-                          ? "px-9 pb-[40px] pt-[76px]"
-                        : useCompactMobileCopy
-                          ? "px-8 pb-8 pt-[100px]"
-                          : "px-9 pb-[40px] pt-[108px]"
-                    } lg:items-center lg:px-[80px] lg:pb-[24px] lg:pt-[68px]`}
-                  >
-                    <p
-                      className="m-0 w-full break-words text-center [overflow-wrap:anywhere] lg:text-[13px]"
-                      style={{
-                        fontFamily: "Nunito Sans, sans-serif",
-                        fontWeight: 800,
-                        fontStyle: "italic",
-                        fontSize: useCompactMobileCopy
-                          ? "clamp(9px, 2.15vw, 10.5px)"
-                          : "clamp(9.5px, 2.3vw, 11px)",
-                        lineHeight: useCompactMobileCopy ? 1.28 : 1.35,
-                        color: "#1e1e1e",
-                      }}
-                    >
-                      {hasFunFact ? (
-                        <>
-                          <span style={{ fontWeight: 700 }}>
-                            {project.description.split("Fun Fact:")[0].trim()}
-                          </span>
-                          <span className="block h-2 lg:h-3" />
-                          <strong style={{ fontWeight: 900 }}>
-                            {"Fun Fact: "}
-                            {project.description.split("Fun Fact:")[1].trim()}
-                          </strong>
-                        </>
-                      ) : (
-                        project.description
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          <button
-            type="button"
-            aria-label="Next project"
-            onClick={next}
-            className="hidden items-center justify-center lg:flex"
-            style={{ ...desktopNavBtnStyle, right: -60 }}
-          >
-            →
-          </button>
-        </div>
+    <div
+      className="group flex flex-col overflow-hidden rounded-[14px] shadow-[2px_4px_18px_rgba(0,0,0,0.1)] transition-[transform,box-shadow] duration-[250ms] hover:-translate-y-[5px] hover:shadow-[4px_10px_28px_rgba(0,0,0,0.5)]"
+      style={{ background: "#0E0808" }}
+    >
+      {/* Preview */}
+      <div
+        className="relative flex w-full shrink-0 items-center justify-center overflow-hidden"
+        style={{ height: 176 }}
+      >
+        {shouldUseVideo ? (
+          <video
+            src={project.mp4}
+            poster={project.poster}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            onError={() => setFailedMp4(true)}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+        ) : fallbackMedia ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={fallbackMedia}
+            alt={project.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-[#1A1010] text-[48px] opacity-35">
+            ðŸ“Š
+          </div>
+        )}
       </div>
 
-      <div className="mt-10 flex justify-center gap-2">
-        {projects.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => goToSlide(i)}
-            aria-label={`Go to project ${i + 1}`}
-            className="h-3 w-3 rounded-full p-0 transition"
-            style={
-              current === i
-                ? { backgroundColor: "#400909", border: "2px solid #400909" }
-                : { backgroundColor: "transparent", border: "2px solid #400909" }
-            }
-          />
+      {/* Body */}
+      <div className="flex flex-1 flex-col p-[18px]">
+        <span
+          className="mb-2 inline-block self-start rounded-[4px] px-2 py-[3px] font-mono text-[10px] uppercase tracking-[0.04em]"
+          style={{
+            background: "rgba(201,151,62,0.15)",
+            color: "#C9973E",
+            border: "1px solid rgba(201,151,62,0.3)",
+          }}
+        >
+          {project.domain}
+        </span>
+
+        <div
+          className="mb-2 text-[17px] font-bold leading-[1.3]"
+          style={{ color: "#F5EEEE" }}
+        >
+          {project.title}
+        </div>
+
+        <div
+          className="mb-3 flex-1 text-[13px] leading-[1.6]"
+          style={{ color: "rgba(245,238,238,0.6)" }}
+        >
+          {project.description}
+        </div>
+
+        <div className="mb-[14px] flex flex-wrap gap-[5px]">
+          {project.techStack.map((tech) => (
+            <span
+              key={tech}
+              className="rounded-[4px] px-[7px] py-[3px] font-mono text-[10px]"
+              style={{
+                background: "rgba(245,238,238,0.06)",
+                color: "rgba(245,238,238,0.55)",
+                border: "1px solid rgba(245,238,238,0.12)",
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-[5px] rounded-[7px] px-[14px] py-[7px] font-mono text-[11px] tracking-[0.03em] no-underline transition-opacity duration-200 hover:opacity-85"
+            style={{
+              border: "1.5px solid #C9973E",
+              background: "#C9973E",
+              color: "#0A0606",
+            }}
+          >
+            ⌥ GitHub
+          </a>
+          <a
+            href={project.live}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-[5px] rounded-[7px] px-[14px] py-[7px] font-mono text-[11px] tracking-[0.03em] no-underline transition-[background,color,border-color] duration-200 hover:bg-[#C9973E] hover:text-[#0A0606] hover:[border-color:#C9973E]"
+            style={{
+              border: "1.5px solid rgba(245,238,238,0.45)",
+              background: "transparent",
+              color: "#F5EEEE",
+            }}
+          >
+            ↗ Live Site
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectGrid() {
+  return (
+    <div className="mx-auto mt-10 w-full max-w-[1200px] px-3 pb-16 sm:px-5 sm:pb-20 md:px-8 lg:px-[60px] lg:pb-8">
+      <div className="grid grid-cols-1 gap-[22px] sm:grid-cols-2">
+        {projects.map((project) => (
+          <ProjectCard key={project.title} project={project} />
         ))}
       </div>
     </div>
@@ -950,18 +797,16 @@ const DroppedStickersLayer = memo(function DroppedStickersLayer({
 });
 
 const SidebarStickerRail = memo(function SidebarStickerRail({
-  scale,
   repeatedSidebarStickers,
   startSidebarDrag,
 }: {
-  scale: number;
   repeatedSidebarStickers: string[];
   startSidebarDrag: (event: React.PointerEvent, src: string, index: number) => void;
 }) {
   return (
     <aside
-      className="absolute left-0 top-0 z-[240] hidden w-[84px] flex-col items-center overflow-hidden border-r border-white/10 bg-white/12 py-2 lg:flex"
-      style={{ top: 0, bottom: "70px", overflow: "hidden" }}
+      className="fixed left-0 top-0 z-[240] hidden w-[84px] flex-col items-center overflow-hidden border-r border-white/10 bg-white/12 py-2 lg:flex"
+      style={{ top: 0, bottom: 0, overflow: "hidden" }}
     >
       <p className="mb-3 w-full px-3 pt-2 text-center text-[12px] font-extrabold uppercase leading-none tracking-[0.1em] text-[#f2d9d6]/90">
         STICKERS
@@ -1088,8 +933,7 @@ export default function HeroPage() {
   }, []);
   const { ref: extrasContainerRef, containerScale: extrasContainerScale } =
     useContainerScale();
-  const { ref: contactContainerRef, containerScale: contactContainerScale } =
-    useContainerScale();
+  const { ref: contactContainerRef } = useContainerScale();
 
   useEffect(() => {
     const updateScale = () => {
@@ -1310,7 +1154,6 @@ export default function HeroPage() {
       ) : null}
 
       <SidebarStickerRail
-        scale={scale}
         repeatedSidebarStickers={repeatedSidebarStickers}
         startSidebarDrag={startSidebarDrag}
       />
@@ -1366,7 +1209,7 @@ export default function HeroPage() {
       ) : null}
 
       <div
-        className={`relative z-[5] w-full min-w-0 pl-4 pr-4 pb-16 md:pr-8 ${scale < 1 ? "max-w-none" : "max-w-[100dvw]"}`}
+        className={`relative z-[5] w-full min-w-0 pl-4 pr-4 md:pr-8 ${scale < 1 ? "max-w-none" : "max-w-[100dvw]"}`}
         style={
           {
             paddingTop: NAV_BAR_HEIGHT_PX,
@@ -1583,619 +1426,107 @@ export default function HeroPage() {
         </div>
 
         <div className="relative mx-auto w-full max-w-[1440px] bg-[#db5e5e] lg:-mt-20">
-          {/* Timeline stem uses bottom:0 — scoped to this wrapper so it ends with work experience. */}
-          <div className="relative w-full">
-            <section
-              id="experience"
-              className="relative z-[2] scroll-mt-28 bg-transparent py-10 lg:py-0"
-              aria-label="Work experience"
-            >
-              {/* Desktop-14: quoted intro (artboard 1440px) */}
-              <div
-                className="relative bg-[#db5e5e] py-8 lg:py-0"
-                role="region"
-                aria-label="Portfolio introduction"
-              >
-                <div className="relative mx-auto hidden max-w-[1440px] overflow-visible lg:block">
-                  <div className="relative min-h-[760px] min-w-[1440px]">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- Figma spec: native <img> */}
-                    <img
-                      src="/images/quote-open.svg"
-                      alt=""
-                      width={106}
-                      height={82}
-                      className="pointer-events-none absolute z-[1]"
-                      style={{ left: 250, top: 31 }}
-                    />
+          {/* Scrapbook intro quote — bridges About Me and Projects */}
+          <div className="relative bg-[#db5e5e] py-8 lg:py-0">
+            <div className="relative mx-auto hidden max-w-[1440px] overflow-visible lg:block">
+              <div className="relative min-h-[420px] min-w-[1440px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/quote-open.svg"
+                  alt=""
+                  width={106}
+                  height={82}
+                  className="pointer-events-none absolute z-[1]"
+                  style={{ left: 250, top: 31 }}
+                />
 
-                    <div
-                      className="absolute z-[2] text-center font-sans text-white"
-                      style={{
-                        left: "50%",
-                        top: 82,
-                        width: 693,
-                        transform: "translateX(-50%) rotate(-0.16deg)",
-                      }}
-                    >
-                      <p className="text-[20px] font-bold italic leading-snug">
-                        {"this portfolio is a bit of a "}
-                        <span className="text-[32px] font-black italic">
-                          scrapbook
-                        </span>
-                        {" of what I've built, learned, and enjoyed along the way."}
-                      </p>
-                      <p className="mt-8 text-[20px] font-extrabold italic leading-snug">
-                        {"Please take a look around."}
-                      </p>
-                    </div>
-
-                    {/* eslint-disable-next-line @next/next/no-img-element -- Figma spec: native <img> */}
-                    <img
-                      src="/images/quote-close.svg"
-                      alt=""
-                      width={98}
-                      height={80}
-                      className="pointer-events-none absolute z-[1]"
-                      style={{
-                        left: 1091,
-                        top: 180,
-                        transform: "rotate(180deg) scaleX(-1)",
-                      }}
-                    />
-
-                    <p
-                      className="absolute z-[2] text-center font-sans text-[32px] font-bold italic leading-snug text-white"
-                      style={{
-                        left: "50%",
-                        top: 312,
-                        width: 709,
-                        transform: "translateX(-50%)",
-                      }}
-                    >
-                      {"alright, let's get into it."}
-                    </p>
-
-                    <div
-                      className="absolute z-[2]"
-                      style={{
-                        position: "absolute",
-                        left: "50%",
-                        top: 494,
-                        transform: "translateX(-50%) rotate(-0.5deg)",
-                        zIndex: 2,
-                        width: "fit-content",
-                      }}
-                    >
-                      <h2
-                        style={{
-                          fontFamily:
-                            "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                          fontSize: 40,
-                          fontWeight: 800,
-                          fontStyle: "italic",
-                          color: "#FAF0DC",
-                          lineHeight: 1.1,
-                          background: "#400909",
-                          padding: "8px 20px",
-                          display: "inline-block",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        WORK EXPERIENCE
-                      </h2>
-                      <div
-                        style={{
-                          height: 4,
-                          background: "#FAF0DC",
-                          marginTop: 6,
-                          width: "100%",
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center gap-6 px-4 py-10 lg:hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/quote-open.svg"
-                    alt=""
-                    width={106}
-                    height={82}
-                    className="w-20 max-w-full sm:w-auto"
-                  />
-                  <div className="mx-auto max-w-[min(693px,100%)] px-1 text-center font-sans text-white lg:-rotate-[0.16deg]">
-                    <p className="text-base font-bold italic leading-snug sm:text-[20px]">
-                      {"this portfolio is a bit of a "}
-                      <span className="text-2xl font-black italic sm:text-[32px]">
-                        scrapbook
-                      </span>
-                      {" of what I've built, learned, and enjoyed along the way."}
-                    </p>
-                    <p className="mt-8 text-base font-extrabold italic leading-snug sm:text-[20px]">
-                      {"Please take a look around."}
-                    </p>
-                  </div>
-                  <p className="max-w-[709px] text-center font-sans text-xl font-bold italic leading-snug text-white sm:text-[32px]">
-                    {"alright, let's get into it."}
+                <div
+                  className="absolute z-[2] text-center font-sans text-white"
+                  style={{
+                    left: "50%",
+                    top: 82,
+                    width: 693,
+                    transform: "translateX(-50%) rotate(-0.16deg)",
+                  }}
+                >
+                  <p className="text-[20px] font-bold italic leading-snug">
+                    {"this portfolio is a bit of a "}
+                    <span className="text-[32px] font-black italic">
+                      scrapbook
+                    </span>
+                    {" of what I've built, learned, and enjoyed along the way."}
                   </p>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/quote-close.svg"
-                    alt=""
-                    width={98}
-                    height={80}
-                    className="mt-8 w-20 max-w-full rotate-180 -scale-x-100 sm:mt-12 sm:w-auto"
-                  />
-                  <div className="mt-8 text-center sm:mt-12">
-                    <div className="mx-auto w-fit max-w-full lg:-rotate-[0.5deg]">
-                      <h2
-                        className="inline-block max-w-full text-balance whitespace-normal lg:whitespace-nowrap"
-                        style={{
-                          fontFamily:
-                            "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                          fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
-                          fontWeight: 800,
-                          fontStyle: "italic",
-                          color: "#FAF0DC",
-                          lineHeight: 1.1,
-                          background: "#400909",
-                          padding: "8px 14px",
-                          display: "inline-block",
-                        }}
-                      >
-                        WORK EXPERIENCE
-                      </h2>
-                      <div
-                        style={{
-                          height: 4,
-                          background: "#FAF0DC",
-                          marginTop: 6,
-                          width: "100%",
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <p className="mt-8 text-[20px] font-extrabold italic leading-snug">
+                    {"Please take a look around."}
+                  </p>
                 </div>
-              </div>
 
-              {/* Figma: vertical timeline at x = 728px (fixed); stem 727–729px. */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute left-[728px] top-[564px] z-[1] hidden h-[11px] w-[11px] -translate-x-1/2 rounded-full bg-[#1e1e1e] lg:block"
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/quote-close.svg"
+                  alt=""
+                  width={98}
+                  height={80}
+                  className="pointer-events-none absolute z-[1]"
+                  style={{
+                    left: 1091,
+                    top: 180,
+                    transform: "rotate(180deg) scaleX(-1)",
+                  }}
+                />
+
+                <p
+                  className="absolute z-[2] text-center font-sans text-[32px] font-bold italic leading-snug text-white"
+                  style={{
+                    left: "50%",
+                    top: 312,
+                    width: 709,
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  {"alright, let's get into it."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-6 px-4 py-10 lg:hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/quote-open.svg"
+                alt=""
+                width={106}
+                height={82}
+                className="w-20 max-w-full sm:w-auto"
               />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute left-[727px] top-[567px] z-[1] hidden w-[2px] bg-[#1e1e1e] lg:block"
-                style={{ height: 4550 }}
+              <div className="mx-auto max-w-[min(693px,100%)] px-1 text-center font-sans text-white">
+                <p className="text-base font-bold italic leading-snug sm:text-[20px]">
+                  {"this portfolio is a bit of a "}
+                  <span className="text-2xl font-black italic sm:text-[32px]">
+                    scrapbook
+                  </span>
+                  {" of what I've built, learned, and enjoyed along the way."}
+                </p>
+                <p className="mt-8 text-base font-extrabold italic leading-snug sm:text-[20px]">
+                  {"Please take a look around."}
+                </p>
+              </div>
+              <p className="max-w-[709px] text-center font-sans text-xl font-bold italic leading-snug text-white sm:text-[32px]">
+                {"alright, let's get into it."}
+              </p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/quote-close.svg"
+                alt=""
+                width={98}
+                height={80}
+                className="mt-8 w-20 max-w-full rotate-180 -scale-x-100 sm:mt-12 sm:w-auto"
               />
-
-              <div className="relative mx-auto hidden max-w-[1440px] overflow-x-clip overflow-y-visible lg:block">
-                <div className="relative z-[2] min-h-[4200px] min-w-[1440px]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 4.svg")}
-                    alt="Heartland Community Network — role card"
-                    width={450}
-                    height={200}
-                    className="absolute left-[196px] top-[88px] z-[2] h-[200px] w-[450px] max-w-none object-contain"
-                  />
-                  <div
-                    aria-hidden
-                    className="pointer-events-none z-[1]"
-                    style={{
-                      position: "absolute",
-                      left: 577,
-                      top: 88 + 100 - 1,
-                      width: 151,
-                      height: 2,
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  />
-
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 3.svg")}
-                    alt="Heartland Community Network — project collage"
-                    width={591}
-                    height={778}
-                    className="absolute left-[756px] top-[88px] h-[778px] w-[591px] max-w-none object-contain"
-                  />
-
-                  <div
-                    className="absolute left-[138px] top-[320px] flex h-[412px] w-[565px] flex-col justify-center gap-5 px-10 py-8 text-center font-sans text-[18px] font-extrabold italic leading-snug text-[#1e1e1e]"
-                    style={{
-                      backgroundImage: "url('/images/Rectangle 78.svg')",
-                      backgroundSize: "100% 100%",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
-                    <p className="mx-auto max-w-[46ch]">
-                      {
-                        "At Heartland Community Network, I work as a Senior Consultant delivering data-driven solutions for clients across finance, healthcare, public safety, and small businesses."
-                      }
-                    </p>
-                    <p className="mx-auto max-w-[46ch]">
-                      {
-                        "I build analytical models, define KPIs, and create dashboards that help people actually make decisions -- not just look at numbers. I also set up data governance standards because trustworthy data is the whole point. If the data isn't reliable, nothing downstream is."
-                      }
-                    </p>
-                  </div>
-
-                  {/* Chicago Public Schools — photo left, job card right (alternating). */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 5.svg")}
-                    alt="Chicago Public Schools — photo collage"
-                    width={619}
-                    height={856}
-                    className="absolute left-[94px] z-[2] h-[856px] w-[619px] max-w-none object-cover object-left"
-                    style={{ top: CPS_TOP }}
-                  />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 10.svg")}
-                    alt="Chicago Public Schools — role card"
-                    width={506}
-                    height={260}
-                    className="absolute left-[843px] z-[2] h-[260px] w-[506px] max-w-none object-contain"
-                    style={{ top: CPS_JOB_TOP }}
-                  />
-                  <div
-                    aria-hidden
-                    className="pointer-events-none z-[1]"
-                    style={{
-                      position: "absolute",
-                      left: 728,
-                      top: CPS_CONNECTOR_TOP,
-                      width: 172,
-                      height: 2,
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  />
-                  <div
-                    className="absolute z-[2] flex h-[410px] w-[552px] flex-col justify-center px-8 py-8 text-center font-sans text-[17px] font-extrabold italic leading-snug text-black"
-                    style={{
-                      left: 843,
-                      top: CPS_DESC_TOP,
-                      backgroundImage: "url('/images/Rectangle 78.svg')",
-                      backgroundSize: "100% 100%",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
-                    <p className="mx-auto max-w-[46ch]">{cpsDescription}</p>
-                  </div>
-
-                  {/* Data Science Consultant — job card left, photo right (same orientation as HCN). */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 12.svg")}
-                    alt="Data Science Consultant — role card"
-                    width={450}
-                    height={260}
-                    className="absolute left-[207px] z-[2] h-[260px] w-[450px] max-w-none object-contain"
-                    style={{ top: DS_JOB_TOP }}
-                  />
-                  <div
-                    aria-hidden
-                    className="pointer-events-none z-[1]"
-                    style={{
-                      position: "absolute",
-                      left: 657,
-                      top: DS_CONNECTOR_TOP,
-                      width: 71,
-                      height: 2,
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 11.svg")}
-                    alt="Data Science Consultant — project collage"
-                    width={687}
-                    height={915}
-                    className="absolute z-[2] max-w-none object-contain"
-                    style={{ left: 750, top: DS_TOP, width: 687, height: 915 }}
-                  />
-                  <div
-                    className="absolute z-[2] flex flex-col justify-center px-8 py-8 text-center font-sans text-[17px] font-extrabold italic leading-snug text-black"
-                    style={{
-                      left: 118,
-                      top: DS_DESC_TOP,
-                      width: 565,
-                      height: 434,
-                      backgroundImage: "url('/images/Rectangle 78.svg')",
-                      backgroundSize: "100% 100%",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
-                    <p className="mx-auto max-w-[46ch]">
-                      {dataScienceConsultantDescriptionFirstParagraph}
-                    </p>
-                    <p className="mx-auto mt-4 max-w-[46ch]">
-                      {dataScienceConsultantDescriptionSecondParagraph}
-                    </p>
-                  </div>
-
-                  {/* Infosys — photo left, job cards right. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 9.svg")}
-                    alt="Infosys — photo collage"
-                    width={661}
-                    height={896}
-                    className="absolute z-[2] max-w-none object-contain"
-                    style={{ left: 50, top: INF_TOP, width: 661, height: 896 }}
-                  />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 13.svg")}
-                    alt="Infosys — role cards"
-                    width={452}
-                    height={462}
-                    className="absolute left-[854px] z-[2] max-w-none object-contain"
-                    style={{ top: INF_JOB_TOP, width: 452, height: 462 }}
-                  />
-                  <div
-                    aria-hidden
-                    className="pointer-events-none z-[1]"
-                    style={{
-                      position: "absolute",
-                      left: 728,
-                      top: INF_CONNECTOR_TOP,
-                      width: 126,
-                      height: 2,
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  />
-                  <div
-                    className="absolute z-[2] flex flex-col justify-center px-8 py-8 text-center font-sans text-[17px] font-extrabold italic leading-snug text-black"
-                    style={{
-                      left: 796,
-                      top: INF_DESC_TOP,
-                      width: 565,
-                      height: 424,
-                      backgroundImage: "url('/images/Rectangle 78.svg')",
-                      backgroundSize: "100% 100%",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
-                    <p className="mx-auto max-w-[46ch]">
-                      {infosysDescriptionFirstParagraph}
-                    </p>
-                    <p className="mx-auto mt-4 max-w-[46ch]">
-                      {infosysDescriptionSecondParagraph}
-                    </p>
-                  </div>
-
-                  {/* Date pills on timeline (x=728); top = connector y − 12; z above z-[1] connectors. */}
-                  <div
-                    className="pointer-events-none font-sans"
-                    style={{
-                      ...experienceDateBadgeBaseStyle,
-                      top: 25,
-                    }}
-                  >
-                    AUG 2025 - PRESENT
-                  </div>
-                  <div
-                    className="pointer-events-none font-sans"
-                    style={{
-                      ...experienceDateBadgeBaseStyle,
-                      top: CPS_CONNECTOR_TOP - 290,
-                    }}
-                  >
-                    OCT 2024 - MAY 2025
-                  </div>
-                  <div
-                    className="pointer-events-none font-sans"
-                    style={{
-                      ...experienceDateBadgeBaseStyle,
-                      top: DS_CONNECTOR_TOP - 250,
-                    }}
-                  >
-                    OCT 2024 - MAY 2025
-                  </div>
-                  <div
-                    className="pointer-events-none font-sans"
-                    style={{
-                      ...experienceDateBadgeBaseStyle,
-                      top: INF_CONNECTOR_TOP - 360,
-                    }}
-                  >
-                    OCT 2024 - MAY 2025
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-8 px-4 py-10 lg:hidden">
-                <div className="mx-auto flex w-full max-w-[450px] flex-col items-center gap-2">
-                  <div
-                    className="max-w-[min(100%,280px)] text-center font-sans text-xs font-extrabold italic leading-snug text-white sm:text-[14px]"
-                    style={{
-                      borderRadius: 999,
-                      padding: "6px 14px",
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  >
-                    AUG 2025 - PRESENT
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 4.svg")}
-                    alt="Heartland Community Network — role card"
-                    width={450}
-                    height={200}
-                    className="h-auto w-full translate-x-4 object-contain sm:translate-x-5"
-                  />
-                </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={encodeURI("/images/Component 3.svg")}
-                  alt="Heartland Community Network — project collage"
-                  width={591}
-                  height={778}
-                  className="mx-auto h-auto w-full max-w-[591px] object-contain"
-                />
-                <div
-                  className="mx-auto w-full max-w-[565px] px-[14%] pb-[9%] pt-[10%] text-center font-sans text-[12px] font-extrabold italic leading-[1.18] text-[#1e1e1e] sm:text-[13px]"
-                  style={{
-                    backgroundImage: "url('/images/Rectangle 78.svg')",
-                    backgroundSize: "100% 100%",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  <div className="flex flex-col justify-center gap-3">
-                    <p className="mx-auto max-w-[34ch]">
-                      {
-                        "At Heartland Community Network, I work as a Senior Consultant delivering data-driven solutions for clients across finance, healthcare, public safety, and small businesses."
-                      }
-                    </p>
-                    <p className="mx-auto max-w-[34ch]">
-                      {
-                        "I build analytical models, define KPIs, and create dashboards that help people actually make decisions -- not just look at numbers. I also set up data governance standards because trustworthy data is the whole point. If the data isn't reliable, nothing downstream is."
-                      }
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mx-auto flex w-full max-w-[619px] flex-col items-center gap-2">
-                  <div
-                    className="max-w-[min(100%,280px)] text-center font-sans text-xs font-extrabold italic leading-snug text-white sm:text-[14px]"
-                    style={{
-                      borderRadius: 999,
-                      padding: "6px 14px",
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  >
-                    OCT 2024 - MAY 2025
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 10.svg")}
-                    alt="Chicago Public Schools — role card"
-                    width={506}
-                    height={260}
-                    className="h-auto w-full max-w-[506px] -translate-x-5 object-contain sm:-translate-x-6"
-                  />
-                </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={encodeURI("/images/Component 5.svg")}
-                  alt="Chicago Public Schools — photo collage"
-                  width={619}
-                  height={856}
-                  className="mx-auto mt-6 h-auto w-full max-w-[619px] translate-x-10 object-contain sm:mt-4 sm:translate-x-12"
-                />
-                <div
-                  className="mx-auto w-full max-w-[552px] px-[14%] pb-[9%] pt-[10%] text-center font-sans text-[13px] font-extrabold italic leading-[1.2] text-black sm:text-[14px]"
-                  style={{
-                    backgroundImage: "url('/images/Rectangle 79.svg')",
-                    backgroundSize: "100% 100%",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  <p className="mx-auto max-w-[38ch]">{cpsDescription}</p>
-                </div>
-
-                <div className="mx-auto flex w-full max-w-[450px] flex-col items-center gap-2">
-                  <div
-                    className="max-w-[min(100%,280px)] text-center font-sans text-xs font-extrabold italic leading-snug text-white sm:text-[14px]"
-                    style={{
-                      borderRadius: 999,
-                      padding: "6px 14px",
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  >
-                    OCT 2024 - MAY 2025
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 12.svg")}
-                    alt="Data Science Consultant — role card"
-                    width={450}
-                    height={260}
-                    className="h-auto w-full object-contain"
-                  />
-                </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={encodeURI("/images/Component 11.svg")}
-                  alt="Data Science Consultant — project collage"
-                  width={687}
-                  height={915}
-                  className="mx-auto h-auto w-full max-w-[687px] object-contain"
-                />
-                <div
-                  className="mx-auto w-full max-w-[565px] px-[12%] pb-[10%] pt-[11%] text-center font-sans text-[12px] font-extrabold italic leading-[1.25] text-black"
-                  style={{
-                    backgroundImage: "url('/images/Rectangle 80.svg')",
-                    backgroundSize: "100% 100%",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  <div className="flex flex-col justify-center gap-3">
-                    <p className="mx-auto max-w-[46ch]">
-                      {dataScienceConsultantDescriptionFirstParagraph}
-                    </p>
-                    <p className="mx-auto max-w-[46ch]">
-                      {dataScienceConsultantDescriptionSecondParagraph}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mx-auto flex w-full max-w-[452px] flex-col items-center gap-2">
-                  <div
-                    className="max-w-[min(100%,280px)] text-center font-sans text-xs font-extrabold italic leading-snug text-white sm:text-[14px]"
-                    style={{
-                      borderRadius: 999,
-                      padding: "6px 14px",
-                      backgroundColor: "#1e1e1e",
-                    }}
-                  >
-                    OCT 2024 - MAY 2025
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI("/images/Component 13.svg")}
-                    alt="Infosys — role cards"
-                    width={452}
-                    height={462}
-                    className="h-auto w-full object-contain"
-                  />
-                </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={encodeURI("/images/Component 9.svg")}
-                  alt="Infosys — photo collage"
-                  width={661}
-                  height={896}
-                  className="mx-auto h-auto w-full max-w-[661px] object-contain"
-                />
-                <div
-                  className="mx-auto w-full max-w-[565px] px-[12%] pb-[12%] pt-[13%] text-center font-sans text-[12px] font-extrabold italic leading-snug text-black"
-                  style={{
-                    backgroundImage: "url('/images/Rectangle 81.svg')",
-                    backgroundSize: "100% 100%",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                >
-                  <div className="flex flex-col justify-center gap-4">
-                    <p className="mx-auto max-w-[46ch]">
-                      {infosysDescriptionFirstParagraph}
-                    </p>
-                    <p className="mx-auto max-w-[46ch]">
-                      {infosysDescriptionSecondParagraph}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
+            </div>
           </div>
 
           <section
             id="personal-projects"
-            className="relative mb-0 scroll-mt-28 bg-[#db5e5e] px-4 pb-12 pt-[40px] md:px-8 md:pb-16 lg:pb-10 lg:pt-[300px]"
+            className="relative mb-0 scroll-mt-28 bg-[#db5e5e] px-4 pb-12 pt-[40px] md:px-8 md:pb-16 lg:pb-10 lg:pt-[60px]"
             aria-label="Personal projects"
           >
             <div className="relative z-[1] mx-auto w-full min-w-0 max-w-[1440px]">
@@ -2234,12 +1565,402 @@ export default function HeroPage() {
               </div>
             </div>
 
-            <ProjectCarousel />
+            <ProjectGrid />
           </section>
+
+          <div className="relative w-full">
+            <section
+              id="experience"
+              className="relative scroll-mt-28 bg-transparent py-16"
+              aria-label="Work experience"
+            >
+              {/* ── HEADING ── */}
+              <div className="px-4 pb-8 text-center">
+                <div className="mx-auto w-fit">
+                  <h2
+                    className="inline-block"
+                    style={{
+                      fontFamily: "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
+                      fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
+                      fontWeight: 800,
+                      fontStyle: "italic",
+                      color: "#FAF0DC",
+                      lineHeight: 1.1,
+                      background: "#400909",
+                      padding: "8px 14px",
+                      display: "inline-block",
+                    }}
+                  >
+                    WORK EXPERIENCE
+                  </h2>
+                  <div style={{ height: 4, background: "#FAF0DC", marginTop: 6, width: "100%" }} />
+                </div>
+              </div>
+
+              {/* ── TIMELINE ── */}
+              <div className="relative mx-auto max-w-[1100px] px-6 pb-16">
+                <div
+                  aria-hidden
+                  className="hidden lg:block"
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: 0,
+                    bottom: 0,
+                    width: 2,
+                    background: "rgba(44,14,14,0.35)",
+                    transform: "translateX(-50%)",
+                    pointerEvents: "none",
+                  }}
+                />
+
+                {/* ── HEARTLAND ── */}
+                <div style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 36 }}>
+                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 11, background: "#400909", color: "#FAF0DC", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                    AUG 2025 – PRESENT
+                  </span>
+                </div>
+
+                <div className="mb-14 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Senior Consultant</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>Heartland Community Network</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                      🌍 Clients across finance, healthcare, public safety &amp; small businesses
+                    </div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
+                      Build analytical models, define KPIs, and create dashboards that help people actually make decisions — not just look at numbers. Set up data governance standards, because if the data isn&apos;t reliable, nothing downstream is.
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["SQL", "Power BI", "Python", "KPI Design", "Data Governance", "Stakeholder Mgmt"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                  </div>
+                  {/* HCN photo mosaic — exact Figma positions (frame 591×778) */}
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                    {/* Indiana SBDC logo */}
+                    <div style={{ position: "absolute", top: "11.83%", right: "69.04%", bottom: "78.28%", left: "15.91%" }}>
+                      <img src="/images/hcn/logo-indiana.png" alt="Indiana SBDC" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    </div>
+                    {/* IU logo */}
+                    <div style={{ position: "absolute", top: "11.83%", right: "49.92%", bottom: "78.28%", left: "35.03%" }}>
+                      <img src="/images/hcn/logo-iu.png" alt="IU" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    </div>
+                    {/* Cook Center logo */}
+                    <div style={{ position: "absolute", top: "11.7%", right: "30.8%", bottom: "78.41%", left: "54.15%" }}>
+                      <img src="/images/hcn/logo-cook.png" alt="Cook Center for Entrepreneurship" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    </div>
+                    {/* Right photo — HCN materials */}
+                    <div style={{ position: "absolute", top: "26.35%", right: "14.89%", bottom: "50.64%", left: "52.28%" }}>
+                      <img src="/images/hcn/photo-materials.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    {/* Left photo — meeting */}
+                    <div style={{ position: "absolute", top: "29.31%", right: "51.78%", bottom: "44.86%", left: "13.54%" }}>
+                      <img src="/images/hcn/photo-meeting1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    {/* Bottom-right photo — Nupur */}
+                    <div style={{ position: "absolute", top: "62.98%", right: "14.89%", bottom: "10.67%", left: "53.13%" }}>
+                      <img src="/images/hcn/photo-nupur.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    {/* Bottom-left photo — library (with original Figma clip offset) */}
+                    <div style={{ position: "absolute", top: "58.23%", right: "55.33%", bottom: "12.21%", left: "13.87%", overflow: "hidden" }}>
+                      <img src="/images/hcn/photo-library.png" alt="" style={{ position: "absolute", width: "100%", height: "140.63%", top: "-10.32%", left: 0, objectFit: "cover" }} />
+                    </div>
+                    {/* Middle-right photo — office */}
+                    <div style={{ position: "absolute", top: "45.5%", right: "22.17%", bottom: "32.65%", left: "50.08%" }}>
+                      <img src="/images/hcn/photo-office.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    {/* Footer watermark */}
+                    <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
+                      HEARTLAND COMMUNITY NETWORK
+                    </div>
+                  </div>
+                  </div>
+                </div>
+
+                <div className="mb-10 flex flex-col gap-4 lg:hidden">
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "11.83%", right: "69.04%", bottom: "78.28%", left: "15.91%" }}><img src="/images/hcn/logo-indiana.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "11.83%", right: "49.92%", bottom: "78.28%", left: "35.03%" }}><img src="/images/hcn/logo-iu.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "11.7%", right: "30.8%", bottom: "78.41%", left: "54.15%" }}><img src="/images/hcn/logo-cook.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "26.35%", right: "14.89%", bottom: "50.64%", left: "52.28%" }}><img src="/images/hcn/photo-materials.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "29.31%", right: "51.78%", bottom: "44.86%", left: "13.54%" }}><img src="/images/hcn/photo-meeting1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "62.98%", right: "14.89%", bottom: "10.67%", left: "53.13%" }}><img src="/images/hcn/photo-nupur.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "58.23%", right: "55.33%", bottom: "12.21%", left: "13.87%", overflow: "hidden" }}><img src="/images/hcn/photo-library.png" alt="" style={{ position: "absolute", width: "100%", height: "140.63%", top: "-10.32%", left: 0, objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "45.5%", right: "22.17%", bottom: "32.65%", left: "50.08%" }}><img src="/images/hcn/photo-office.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>HEARTLAND COMMUNITY NETWORK</div>
+                    </div>
+                  </div>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Senior Consultant</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Heartland Community Network</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>🌍 Clients across finance, healthcare, public safety &amp; small businesses</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>Build analytical models, define KPIs, and create dashboards that help people actually make decisions — not just look at numbers. Set up data governance standards, because if the data isn&apos;t reliable, nothing downstream is.</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["SQL", "Power BI", "Python", "KPI Design", "Data Governance", "Stakeholder Mgmt"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── OCT 2024 ── */}
+                <div style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 36, marginTop: 12 }}>
+                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 11, background: "#400909", color: "#FAF0DC", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                    OCT 2024 – MAY 2025
+                  </span>
+                </div>
+
+                <div className="mb-10 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
+                  {/* CPS photo mosaic — exact Figma positions (frame 619×856) */}
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}>
+                        <img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "35.08%", right: "58.08%", bottom: "39.13%", left: "16.01%" }}>
+                        <img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "69.95%", right: "11.94%", bottom: "9.84%", left: "42.21%" }}>
+                        <img src="/images/cps/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "54.86%", right: "34.79%", bottom: "28.31%", left: "42.21%" }}>
+                        <img src="/images/cps/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "63.28%", right: "60.7%", bottom: "12.13%", left: "13.54%" }}>
+                        <img src="/images/cps/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "33.77%", right: "15.72%", bottom: "45.14%", left: "45.27%" }}>
+                        <img src="/images/cps/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
+                        CHICAGO PUBLIC SCHOOLS
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                  </div>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Graduate Student Assistant</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>Chicago Public Schools — Administrative Testing Staff</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                      📋 5,000+ student records managed across multiple school sites
+                    </div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
+                      {cpsDescription}
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["Data Validation", "Excel", "Variance Analysis", "Process Improvement"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-14 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Data Science Consultant</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>The Build Fellowship</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                      💡 First time I realized data storytelling was the part I loved most
+                    </div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
+                      {dataScienceConsultantDescriptionFirstParagraph}{" "}{dataScienceConsultantDescriptionSecondParagraph}
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["Predictive Modeling", "Python", "Dashboards", "Data Storytelling"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                  </div>
+                  {/* Build Fellowship photo mosaic — exact Figma positions (frame 687×915) */}
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}>
+                        <img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "62.62%", right: "13.25%", bottom: "10.38%", left: "20.23%" }}>
+                        <img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "46.89%", right: "13.25%", bottom: "32.35%", left: "46.14%" }}>
+                        <img src="/images/build/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
+                        THE BUILD FELLOWSHIP
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-10 flex flex-col gap-6 lg:hidden">
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}><img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "35.08%", right: "58.08%", bottom: "39.13%", left: "16.01%" }}><img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "69.95%", right: "11.94%", bottom: "9.84%", left: "42.21%" }}><img src="/images/cps/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "54.86%", right: "34.79%", bottom: "28.31%", left: "42.21%" }}><img src="/images/cps/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "63.28%", right: "60.7%", bottom: "12.13%", left: "13.54%" }}><img src="/images/cps/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "33.77%", right: "15.72%", bottom: "45.14%", left: "45.27%" }}><img src="/images/cps/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>CHICAGO PUBLIC SCHOOLS</div>
+                    </div>
+                  </div>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Graduate Student Assistant</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Chicago Public Schools — Administrative Testing Staff</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>📋 5,000+ student records managed across multiple school sites</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>{cpsDescription}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["Data Validation", "Excel", "Variance Analysis", "Process Improvement"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}><img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "62.62%", right: "13.25%", bottom: "10.38%", left: "20.23%" }}><img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "46.89%", right: "13.25%", bottom: "32.35%", left: "46.14%" }}><img src="/images/build/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>THE BUILD FELLOWSHIP</div>
+                    </div>
+                  </div>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Data Science Consultant</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>The Build Fellowship</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>💡 First time I realized data storytelling was the part I loved most</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>{dataScienceConsultantDescriptionFirstParagraph}{" "}{dataScienceConsultantDescriptionSecondParagraph}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["Predictive Modeling", "Python", "Dashboards", "Data Storytelling"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── INFOSYS ── */}
+                <div style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 36, marginTop: 12 }}>
+                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 11, background: "#400909", color: "#FAF0DC", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                    2019 – 2023 · INFOSYS
+                  </span>
+                </div>
+
+                <div className="hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
+                  {/* Infosys photo mosaic — exact Figma positions (frame 661×896) */}
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}>
+                        <img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "38.36%", right: "54.29%", bottom: "29.29%", left: "13.1%" }}>
+                        <img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "75.85%", right: "33.19%", bottom: "6.01%", left: "21.11%" }}>
+                        <img src="/images/infosys/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "43.28%", right: "11.06%", bottom: "38.14%", left: "51.82%" }}>
+                        <img src="/images/infosys/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "69.29%", right: "66.38%", bottom: "17.6%", left: "7.28%" }}>
+                        <img src="/images/infosys/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "58.8%", right: "8.15%", bottom: "10.6%", left: "55.17%" }}>
+                        <img src="/images/infosys/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", top: "57.16%", right: "48.62%", bottom: "26.99%", left: "30.42%" }}>
+                        <img src="/images/infosys/photo7.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
+                        INFOSYS LIMITED
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                  </div>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Technology Analyst</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>Infosys Limited · Solvay Client · Bangalore</div>
+                    {/* Role progression */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+                      {[
+                        { label: "Systems Engineer", active: false },
+                        { label: "Senior Systems Engineer", active: false },
+                        { label: "Technology Analyst", active: true },
+                      ].map(({ label, active }, i, arr) => (
+                        <div key={label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ fontFamily: "monospace", fontSize: 10, padding: "3px 9px", borderRadius: 4, color: active ? "#C9973E" : "rgba(250,240,220,0.45)", background: active ? "rgba(201,151,62,0.15)" : "rgba(250,240,220,0.05)", border: active ? "1px solid rgba(201,151,62,0.4)" : "1px solid rgba(250,240,220,0.1)", fontWeight: active ? 700 : 400 }}>{label}</span>
+                          {i < arr.length - 1 && <span style={{ color: "rgba(250,240,220,0.25)", fontSize: 10 }}>→</span>}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                      🏆 RISE Award — Best Team, Project Excellence (FY24)
+                    </div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
+                      {infosysDescriptionFirstParagraph}{" "}{infosysDescriptionSecondParagraph}
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["AWS", "Cloud Systems", "Automation", "Enterprise Clients", "ITIL V4"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4 lg:hidden">
+                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                      <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}><img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "38.36%", right: "54.29%", bottom: "29.29%", left: "13.1%" }}><img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "75.85%", right: "33.19%", bottom: "6.01%", left: "21.11%" }}><img src="/images/infosys/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "43.28%", right: "11.06%", bottom: "38.14%", left: "51.82%" }}><img src="/images/infosys/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "69.29%", right: "66.38%", bottom: "17.6%", left: "7.28%" }}><img src="/images/infosys/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "58.8%", right: "8.15%", bottom: "10.6%", left: "55.17%" }}><img src="/images/infosys/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "57.16%", right: "48.62%", bottom: "26.99%", left: "30.42%" }}><img src="/images/infosys/photo7.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>INFOSYS LIMITED</div>
+                    </div>
+                  </div>
+                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Technology Analyst</div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Infosys Limited · 2019–2023</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10, flexWrap: "wrap" }}>
+                      {[
+                        { label: "Systems Engineer", active: false },
+                        { label: "Senior Systems Engineer", active: false },
+                        { label: "Technology Analyst", active: true },
+                      ].map(({ label, active }, i, arr) => (
+                        <div key={label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                          <span style={{ fontFamily: "monospace", fontSize: 9, padding: "2px 7px", borderRadius: 4, color: active ? "#C9973E" : "rgba(250,240,220,0.45)", background: active ? "rgba(201,151,62,0.15)" : "rgba(250,240,220,0.05)", border: active ? "1px solid rgba(201,151,62,0.4)" : "1px solid rgba(250,240,220,0.1)", fontWeight: active ? 700 : 400 }}>{label}</span>
+                          {i < arr.length - 1 && <span style={{ color: "rgba(250,240,220,0.25)", fontSize: 9 }}>→</span>}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>🏆 RISE Award — Best Team, Project Excellence (FY24)</div>
+                    <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>{infosysDescriptionFirstParagraph}{" "}{infosysDescriptionSecondParagraph}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {["AWS", "Cloud Systems", "Automation", "Enterprise Clients", "ITIL V4"].map((t) => (
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+          </div>
 
           <section
             id="certifications-preview"
-            className="relative -mt-6 scroll-mt-28 bg-[#db5e5e] px-4 pb-20 pt-0 md:px-8 md:pb-24 lg:mt-10 lg:pb-28"
+            className="relative scroll-mt-28 bg-[#db5e5e] px-4 pb-20 pt-10 md:px-8 md:pb-24 lg:pb-28"
             aria-label="Certifications and skills preview"
           >
             <div className="relative mx-auto w-full max-w-[1440px]">
@@ -2299,14 +2020,56 @@ export default function HeroPage() {
                       this point. The full list is on my resume. This is just the
                       fun version.
                     </p>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={encodeURI("/images/Component 22.svg")}
-                      alt="Laptop with skill stickers and technology logos"
-                      width={778}
-                      height={576}
-                      className="h-auto w-full max-w-[778px] object-contain"
-                    />
+                    {/* SVG laptop with interactive hover zones over each sticker */}
+                    <div style={{ position: "relative", maxWidth: 778 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={encodeURI("/images/Component 22.svg")}
+                        alt="Laptop with skill stickers and technology logos"
+                        width={778}
+                        height={576}
+                        className="h-auto w-full object-contain"
+                      />
+                      {/* Hover zones — positions as % of SVG 778×576 viewBox */}
+                      {([
+                        { label: "Python",       left: "6.7%",  top: "17.9%", w: "18.5%", h: "14.1%" },
+                        { label: "R",            left: "33.0%", top: "15.8%", w: "10.3%", h: "11.8%" },
+                        { label: "Tableau",      left: "51.2%", top: "17.4%", w: "19.9%", h: "15.1%" },
+                        { label: "Google Cloud", left: "9.3%",  top: "31.6%", w: "21.7%", h: "16.5%" },
+                        { label: "Jupyter",      left: "10.4%", top: "68.2%", w: "12.5%", h: "19.6%" },
+                        { label: "AWS",          left: "55.7%", top: "45.0%", w: "19.9%", h: "15.1%" },
+                        { label: "AWS (alt)",    left: "34.8%", top: "33.3%", w: "20.1%", h: "15.3%" },
+                        { label: "GitHub",       left: "24.9%", top: "55.7%", w: "9.9%",  h: "12.5%" },
+                        { label: "Excel",        left: "53.2%", top: "62.3%", w: "15.4%", h: "20.8%" },
+                        { label: "CSS",          left: "34.8%", top: "55.7%", w: "9.9%",  h: "12.5%" },
+                        { label: "JS",           left: "43.3%", top: "55.7%", w: "9.9%",  h: "12.5%" },
+                        { label: "HTML",         left: "9.5%",  top: "47.9%", w: "12.9%", h: "14.6%" },
+                        { label: "SQL",          left: "50.4%", top: "7.6%",  w: "10.8%", h: "12.5%" },
+                        { label: "Power BI",     left: "29.9%", top: "69.6%", w: "10.0%", h: "15.1%" },
+                      ] as const).map(({ label, left, top, w, h }) => (
+                        <div
+                          key={label}
+                          title={label}
+                          style={{
+                            position: "absolute",
+                            left, top, width: w, height: h,
+                            borderRadius: 8,
+                            cursor: "pointer",
+                            transition: "box-shadow 0.2s, transform 0.2s",
+                          }}
+                          onMouseEnter={e => {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.boxShadow = "0 0 0 2px rgba(255,255,255,0.7), 0 4px 18px rgba(255,255,255,0.35)";
+                            el.style.transform = "scale(1.08)";
+                          }}
+                          onMouseLeave={e => {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.boxShadow = "";
+                            el.style.transform = "";
+                          }}
+                        />
+                      ))}
+                    </div>
 
                     <a
                       href="/resume/Nupur-Gudigar-Resume.pdf"
@@ -2325,14 +2088,34 @@ export default function HeroPage() {
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.45, delay: 0.12, ease: "easeOut" }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={encodeURI("/images/Component 21.svg")}
-                      alt="Hanging name badge listing certifications"
-                      width={390}
-                      height={840}
-                      className="h-auto w-full object-contain"
-                    />
+                    <div className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={encodeURI("/images/Component 21.svg")}
+                        alt="Hanging name badge listing certifications"
+                        width={390}
+                        height={840}
+                        className="h-auto w-full object-contain"
+                      />
+                      {/* Cert stamp overlays — coords are % of SVG viewBox 390×840, width extends to cover logo + text */}
+                      {[
+                        { label: "Certification 1", href: "#", left: "13%", top: "48.69%", width: "74%", height: "14.17%" },
+                        { label: "Certification 2", href: "#", left: "13%", top: "62.86%", width: "74%", height: "8.21%" },
+                        { label: "Certification 3", href: "#", left: "13%", top: "69.76%", width: "74%", height: "14.17%" },
+                        { label: "Certification 4", href: "#", left: "16%", top: "83.93%", width: "71%", height: "10.60%" },
+                      ].map((cert) => (
+                        <a
+                          key={cert.label}
+                          href={cert.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Verify ${cert.label}`}
+                          className="absolute rounded transition-all duration-200 hover:ring-2 hover:ring-white/60"
+                          style={{ left: cert.left, top: cert.top, width: cert.width, height: cert.height }}
+                        />
+                      ))}
+                    </div>
+
                     <p className="mt-4 text-center font-sans text-[28px] font-extrabold italic leading-tight text-white md:text-[36px]">
                       I&apos;M CERTIFIED TOO
                     </p>
@@ -2344,7 +2127,7 @@ export default function HeroPage() {
 
           <BeyondResumeSection />
 
-          {/* ── EXTRAS ── */}
+          {/* -- EXTRAS -- */}
           <div className="bg-[#db5e5e] px-4 pb-6 pt-10 text-center lg:hidden">
             <div className="mx-auto w-fit max-w-full">
               <h2
@@ -2448,7 +2231,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -2544,7 +2327,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -2640,7 +2423,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -2736,7 +2519,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -2832,7 +2615,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -2928,7 +2711,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -3024,7 +2807,7 @@ export default function HeroPage() {
                         width: "100%",
                         height: "100%",
                         transition:
-                          "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
                         transformStyle: "preserve-3d",
                         transform: "rotateX(0deg)",
                         cursor: "pointer",
@@ -3246,362 +3029,188 @@ export default function HeroPage() {
             </div>
           </div>
 
-          {/* ── CONTACT ── */}
-          <div ref={contactContainerRef} style={{ width: "100%" }}>
-            <div
-              style={{
-                width: "100%",
-                height: 1024 * contactContainerScale + 82,
-                overflow: "visible",
-                backgroundColor: "#db5e5e",
-                margin: 0,
-                padding: 0,
-                position: "relative",
-              }}
-            >
-              <div
-                id="contact"
-                className="scroll-mt-28 max-lg:-translate-x-[35px]"
-                style={{
-                  width: 1440,
-                  height: 1024,
-                  position: "relative",
-                  transformOrigin: "top left",
-                  transform: `scale(${contactContainerScale})`,
-                }}
-              >
-                {/* Phone handset — left side, connected to cord */}
-                <img
-                  src={encodeURI("/images/Rectangle 151.svg")}
-                  alt=""
-                  className="max-lg:translate-x-[280px] max-lg:-translate-y-[40px] max-lg:scale-[1.12] lg:translate-x-[300px] lg:-translate-y-[72px]"
-                  style={{
-                    position: "absolute",
-                    left: -50,
-                    top: -340,
-                    width: 460,
-                    height: 1220,
-                    objectFit: "contain",
-                    zIndex: 2,
-                  }}
-                />
-                {/* Speech bubble (body + tail) + copy — lg+ only: scale down; mobile uses full design coords like the rest of #contact */}
-                <div
-                  className="origin-top-left max-lg:scale-[0.82] max-lg:translate-x-[250px] lg:origin-[48px_12px] lg:translate-x-[242px] lg:scale-[0.74]"
-                  style={{
-                    position: "absolute",
-                    left: 540,
-                    top: 128,
-                    width: 600,
-                    height: 250,
-                    zIndex: 2,
-                  }}
-                >
+          {/* -- CONTACT -- */}
+          <div id="contact" className="scroll-mt-28" ref={contactContainerRef} style={{ width: "100%", backgroundColor: "#db5e5e", display: "flex", flexDirection: "column" }}>
+            {/* Main contact grid */}
+            <div className="mx-auto w-full max-w-[1200px] px-6 pt-16 pb-16 md:px-10" style={{ flex: 1 }}>
+              <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2 lg:gap-[60px]">
+
+                {/* LEFT: phone image + "let's talk" + pick platform */}
+                <div className="flex flex-col items-center text-center lg:-mt-20">
+                  <img
+                    src={encodeURI("/images/Rectangle 151.svg")}
+                    alt="Phone"
+                    style={{
+                      height: 300,
+                      width: "auto",
+                      marginBottom: 16,
+                      objectFit: "contain",
+                    }}
+                  />
                   <div
                     style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                      width: 600,
-                      height: 250,
-                      backgroundColor: "#400909",
-                      borderRadius: 100,
-                      zIndex: 1,
-                    }}
-                  >
-                    {/* Bubble tail — large triangle pointing down-left toward phone */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 36,
-                        left: -140,
-                        width: 170,
-                        height: 85,
-                        backgroundColor: "#400909",
-                        clipPath: "polygon(100% 0, 0 96%, 100% 100%)",
-                      }}
-                    />
-                  </div>
-
-                  <p
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 20,
-                      width: 600,
-                      fontSize: 88,
-                      fontFamily: "'Nunito Sans', sans-serif",
+                      fontFamily: "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
+                      fontSize: "clamp(28px, 4vw, 42px)",
                       fontWeight: 800,
                       fontStyle: "italic",
-                      color: "#ffffff",
-                      lineHeight: "normal",
-                      textAlign: "center",
-                      zIndex: 2,
-                      margin: 0,
+                      background: "#400909",
+                      color: "#FAF0DC",
+                      padding: "10px 28px 12px",
+                      borderRadius: 50,
+                      display: "inline-block",
+                      marginTop: -36,
+                      marginBottom: 10,
+                      marginLeft: 64,
+                      lineHeight: 1.1,
                     }}
                   >
                     let&apos;s talk!!
-                  </p>
-
+                  </div>
                   <p
                     style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 140,
-                      width: 600,
-                      fontSize: 24,
-                      fontFamily: "'Nunito Sans', sans-serif",
-                      fontWeight: 800,
-                      fontStyle: "italic",
-                      color: "#ffffff",
-                      lineHeight: "normal",
-                      textAlign: "center",
-                      zIndex: 2,
+                      fontFamily: "monospace",
+                      fontSize: 13,
+                      color: "rgba(247,236,236,0.55)",
+                      letterSpacing: "0.04em",
                       margin: 0,
                     }}
                   >
-                    pick your platform, i don&apos;t bite!
+                    pick your platform, i don&apos;t bite
                   </p>
                 </div>
 
-                {/* Contact cards */}
-                <a
-                  href="https://github.com/Nupur-Gudigar"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-transform duration-300 hover:scale-[1.03]"
-                  style={{
-                    position: "absolute",
-                    left: 242,
-                    top: 493,
-                    width: 612,
-                    height: 168,
-                    zIndex: 3,
-                    display: "block",
-                    textDecoration: "none",
-                  }}
-                >
-                  <img
-                    src={encodeURI("/images/Component 17.svg")}
-                    alt="GitHub"
-                    className="contact-card-float contact-card-float-delay-1"
+                {/* RIGHT: seeking statement + contact grid + end pill */}
+                <div className="flex flex-col" style={{ paddingTop: 12 }}>
+                  {/* Seeking statement */}
+                  <div
                     style={{
-                      position: "absolute",
-                      inset: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </a>
-
-                <a
-                  href="https://discord.com/users/422368252531048469"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-transform duration-300 hover:scale-[1.03]"
-                  style={{
-                    position: "absolute",
-                    left: 802,
-                    top: 446,
-                    width: 512,
-                    height: 274,
-                    zIndex: 3,
-                    display: "block",
-                    textDecoration: "none",
-                  }}
-                >
-                  <img
-                    src={encodeURI("/images/Component 18.svg")}
-                    alt="Discord"
-                    className="contact-card-float contact-card-float-delay-2"
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </a>
-
-                <a
-                  href="mailto:nupurgudigar.tech@gmail.com"
-                  className="transition-transform duration-300 hover:scale-[1.03]"
-                  style={{
-                    position: "absolute",
-                    left: 235,
-                    top: 691,
-                    width: 693,
-                    height: 167,
-                    zIndex: 3,
-                    display: "block",
-                    textDecoration: "none",
-                  }}
-                >
-                  <img
-                    src={encodeURI("/images/Component 19.svg")}
-                    alt="Email"
-                    className="contact-card-float contact-card-float-delay-3"
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </a>
-
-                <a
-                  href="https://www.linkedin.com/in/nupur-gudigar"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-transform duration-300 hover:scale-[1.03]"
-                  style={{
-                    position: "absolute",
-                    left: 799,
-                    top: 633,
-                    width: 498,
-                    height: 292,
-                    zIndex: 3,
-                    display: "block",
-                    textDecoration: "none",
-                  }}
-                >
-                  <img
-                    src={encodeURI("/images/Component 20.svg")}
-                    alt="LinkedIn"
-                    className="contact-card-float contact-card-float-delay-4"
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </a>
-
-                <img
-                  src={encodeURI("/images/Rectangle 147.svg")}
-                  alt="Achievement Made"
-                  style={{
-                    position: "absolute",
-                    left: "54%",
-                    top: 885,
-                    width: 420,
-                    height: 75,
-                    objectFit: "contain",
-                    transform: "translateX(-50%)",
-                    zIndex: 3,
-                  }}
-                />
-
-              </div>
-
-              <div
-                className="max-lg:!h-[130px] max-lg:!bottom-0 max-lg:translate-y-[88px]"
-                style={{
-                  position: "absolute",
-                  bottom: -62,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: "200vw",
-                  height: 86,
-                  backgroundColor: "rgba(255,255,255,0.14)",
-                  zIndex: 1,
-                }}
-              />
-              <p
-                className="max-lg:text-[clamp(11px,3.2vw,16px)] max-lg:px-[max(12px,env(safe-area-inset-left))] max-lg:pr-[max(12px,env(safe-area-inset-right))] max-lg:!h-[130px] max-lg:pb-[30px] max-lg:!bottom-0 max-lg:translate-y-[82px]"
-                style={{
-                  position: "absolute",
-                  bottom: -62,
-                  left: 0,
-                  width: "100%",
-                  height: 86,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  fontSize: 18,
-                  fontFamily: "'Nunito Sans', sans-serif",
-                  fontStyle: "italic",
-                  fontWeight: 700,
-                  color: "#f7ecec",
-                  lineHeight: "normal",
-                  zIndex: 2,
-                  margin: 0,
-                  boxSizing: "border-box",
-                }}
-              >
-                © 2025 Nupur Gudigar · designed &amp; built with questionable sleep habits
-              </p>
-              <div
-                className="max-lg:!right-auto max-lg:!left-1/2 max-lg:!-translate-x-[55%] max-lg:!bottom-0 max-lg:translate-y-[90px]"
-                style={{
-                  position: "absolute",
-                  bottom: -62,
-                  right: 24,
-                  height: 86,
-                  display: "flex",
-                  alignItems: "center",
-                  zIndex: 200,
-                  pointerEvents: "auto",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    backgroundColor: "rgba(38, 35, 35, 0.84)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    borderRadius: 12,
-                    padding: "9px 17px",
-                    boxShadow: "0 2px 14px rgba(0,0,0,0.3)",
-                    border: "1px solid rgba(255,255,255,0.04)",
-                  }}
-                >
-                  <svg
-                    width={22}
-                    height={22}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden
-                    style={{
-                      color: "#E8A4A4",
-                      flexShrink: 0,
-                      display: "block",
+                      fontSize: 14,
+                      lineHeight: 1.75,
+                      color: "rgba(247,236,236,0.85)",
+                      fontStyle: "italic",
+                      marginBottom: 20,
+                      padding: "14px 18px",
+                      background: "rgba(44,14,14,0.2)",
+                      borderRadius: 10,
+                      borderLeft: "3px solid #400909",
                     }}
                   >
-                    <path
-                      d="M3.5 12.5 Q12 6.25 20.5 12.5"
-                      stroke="currentColor"
-                      strokeWidth={2.25}
-                      strokeLinecap="round"
-                    />
-                    <circle cx={12} cy={15.25} r={3.25} fill="currentColor" />
-                  </svg>
-                  <span
-                    style={{
-                      fontFamily: "'Nunito Sans', sans-serif",
-                      fontSize: 17,
-                      fontWeight: 600,
-                      color: "#E8A4A4",
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
-                    {viewCount === "loading"
-                      ? "…"
-                      : viewCount.toLocaleString()}
-                  </span>
+                    Currently open to{" "}
+                    <strong style={{ fontStyle: "normal", color: "#FAF0DC", fontWeight: 600 }}>
+                      data engineering and analytics consulting roles across the United States
+                    </strong>
+                    {" "}especially in healthcare and manufacturing. I build things that make data actually useful to the people who need it. I also actually reply.
+                  </div>
+
+                  {/* 2×2 contact cards — original SVG designs, uniform size */}
+                  <div className="mb-[22px] grid grid-cols-2 gap-x-[14px] gap-y-[14px]">
+                    {(
+                      [
+                        { href: "https://github.com/Nupur-Gudigar",               src: "/images/Component 17.svg", alt: "GitHub",  newTab: true  },
+                        { href: "https://discord.com/users/422368252531048469",    src: "/images/Component 18.svg", alt: "Discord", newTab: true  },
+                        { href: "mailto:nupurgudigar.tech@gmail.com",             src: "/images/Component 19.svg", alt: "Email",   newTab: false },
+                        { href: "https://www.linkedin.com/in/nupur-gudigar",      src: "/images/Component 20.svg", alt: "LinkedIn",newTab: true  },
+                      ] as const
+                    ).map(({ href, src, alt, newTab }) => (
+                      <a
+                        key={alt}
+                        href={href}
+                        target={newTab ? "_blank" : undefined}
+                        rel={newTab ? "noopener noreferrer" : undefined}
+                        className={`flex transition-[filter] duration-300 hover:brightness-110`}
+                        style={{
+                          textDecoration: "none",
+                          overflow: "visible",
+                          alignItems: "center",
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={encodeURI(src)}
+                          alt={alt}
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: "100%",
+                            objectFit: "contain",
+                            transform: alt === "Email" || alt === "GitHub" ? "scale(1.35)" : undefined,
+                          }}
+                        />
+                      </a>
+                    ))}
+                  </div>
+
+                  {/* End pill */}
+                  <div style={{ textAlign: "center" }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        background: "rgba(44,14,14,0.3)",
+                        border: "1px solid rgba(44,14,14,0.45)",
+                        padding: "8px 18px",
+                        borderRadius: 8,
+                        fontFamily: "monospace",
+                        fontSize: 12,
+                        color: "#FAF0DC",
+                      }}
+                    >
+                      🎮 Achievement Made!&nbsp;&nbsp;The End?
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
+        </div>
+      </div>
+      {/* Footer — full width at root level */}
+      <div
+        className="w-full lg:ml-[84px] lg:w-[calc(100%-84px)]"
+        style={{
+          borderTop: "1px solid rgba(255,255,255,0.18)",
+          padding: "16px 40px 20px",
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            fontFamily: "var(--font-nunito), 'Nunito Sans', sans-serif",
+            fontStyle: "italic",
+            fontWeight: 700,
+            color: "#f7ecec",
+            lineHeight: 1.2,
+            textAlign: "center",
+          }}
+        >
+          © 2025 Nupur Gudigar · designed &amp; built with questionable sleep habits
+        </p>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            backgroundColor: "rgba(38,35,35,0.84)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            padding: "5px 14px",
+            borderRadius: 20,
+            border: "1px solid rgba(255,255,255,0.04)",
+            boxShadow: "0 2px 14px rgba(0,0,0,0.3)",
+            fontFamily: "var(--font-nunito), 'Nunito Sans', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "#E8A4A4",
+          }}
+        >
+          👁{" "}{viewCount === "loading" ? "…" : viewCount.toLocaleString()}{" "}views
         </div>
       </div>
     </div>

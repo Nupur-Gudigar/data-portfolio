@@ -62,3 +62,15 @@ body {
 .contact-card-float-delay-4 {
   animation-delay: 1.05s;
 }
+
+@keyframes idScanline {
+  0% { top: -5%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 108%; opacity: 0; }
+}
+
+@keyframes idBlink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+}

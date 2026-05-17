@@ -12,7 +12,7 @@ export function NavBar() {
 
   useEffect(() => {
     const handleScrollListener = () => {
-      const sections = ["about", "experience", "personal-projects", "extras", "contact"];
+      const sections = ["about", "personal-projects", "experience", "extras", "contact"];
       const scrollPos = window.scrollY + NAV_BAR_HEIGHT_PX + 50;
       let current = "about";
       let minDistance = Infinity;
@@ -93,19 +93,19 @@ export function NavBar() {
           </a>
           {" / "}
           <a
-            href="#experience"
-            onClick={(e) => handleScroll(e, "experience")}
-            className={linkClass("experience")}
-          >
-            WORK EXPERIENCE
-          </a>
-          {" / "}
-          <a
             href="#personal-projects"
             onClick={(e) => handleScroll(e, "personal-projects")}
             className={linkClass("personal-projects")}
           >
             PROJECTS
+          </a>
+          {" / "}
+          <a
+            href="#experience"
+            onClick={(e) => handleScroll(e, "experience")}
+            className={linkClass("experience")}
+          >
+            WORK EXPERIENCE
           </a>
           {" / "}
           <a
@@ -158,18 +158,18 @@ export function NavBar() {
                 ABOUT ME
               </a>
               <a
-                href="#experience"
-                onClick={(e) => handleScroll(e, "experience")}
-                className="text-[32px] font-extrabold italic text-[#FAF0DC]"
-              >
-                WORK EXPERIENCE
-              </a>
-              <a
                 href="#personal-projects"
                 onClick={(e) => handleScroll(e, "personal-projects")}
                 className="text-[32px] font-extrabold italic text-[#FAF0DC]"
               >
                 PROJECTS
+              </a>
+              <a
+                href="#experience"
+                onClick={(e) => handleScroll(e, "experience")}
+                className="text-[32px] font-extrabold italic text-[#FAF0DC]"
+              >
+                WORK EXPERIENCE
               </a>
               <a
                 href="#extras"
