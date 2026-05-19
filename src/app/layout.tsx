@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Nunito_Sans } from "next/font/google";
+import { Nunito_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const nunitoSans = Nunito_Sans({
   variable: "--font-nunito",
   subsets: ["latin"],
   weight: ["400", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["700", "900"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -26,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${nunitoSans.variable} min-h-full antialiased`}
+      className={`${nunitoSans.variable} ${playfairDisplay.variable} min-h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col overflow-x-hidden overflow-y-visible">

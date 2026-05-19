@@ -75,6 +75,7 @@ const projects = [
     ],
   },
   {
+    achievement: { label: "🏆 Codedex × GitHub Education Winner", color: "#BA7517" },
     title: "SpinTember - The Ultimate Adventure Wheel!",
     description:
       "A cross-platform desktop application built with React, Vite, and Electron that generates randomized activity suggestions through an interactive spinning wheel. Features state management with Redux, webcam integration, and dynamic UI/UX elements. Fun Fact: This was recognized as a winner in the Codedex x GitHub Education September Coding Challenge.",
@@ -97,6 +98,7 @@ const projects = [
     ],
   },
   {
+    achievement: { label: "★ Codedex Staff Pick · Newsletter Feature", color: "#185FA5" },
     title: "Heart Screen",
     description:
       "A full-screen generative art sketch built with p5.js, featuring layered, animated hearts in shifting shades of pink and red. Designed as a minimal, immersive visual experience with continuous motion and responsive scaling. Fun Fact: this project was featured as a Staff Pick and highlighted in the Codedex newsletter.",
@@ -250,11 +252,7 @@ function useContainerScale(designWidth: number = 1440) {
   return { ref, containerScale };
 }
 
-const bioParagraphs = [
-  "I'm a data analytics and consulting professional with a background in software engineering basically a bit of a Swiss Army knife when it comes to tech. I hold a Master's Degree in Computer Science (Data Analytics) from the Illinois Institute of Technology, Chicago",
-  "I've always been more interested in the full picture not just dashboards and models, but how data turns into decisions people actually enjoy acting on. If it doesn't feel right, I'm probably already redesigning it (yes, in Figma, for fun).",
-  "Outside of work, I'm a gamer at heart which honestly explains a lot. Good design, smooth systems, intuitive experiences I care about all of it, probably more than I should.",
-] as const;
+const aboutTechStack = ["Python", "SQL", "dbt", "Tableau", "Spark", "Snowflake", "Figma"] as const;
 
 
 const dataScienceConsultantDescriptionFirstParagraph =
@@ -306,74 +304,46 @@ function toggleExtrasFlipOnTouch(e: React.MouseEvent<HTMLDivElement>) {
 }
 
 function BeyondResumeSection() {
-  const [statesGeo, setStatesGeo] = useState<Array<{ id: string; d: string }>>(
-    [],
-  );
+  const [statesGeo, setStatesGeo] = useState<Array<{ id: string; d: string }>>([]);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
-  const [hoveredPin, setHoveredPin] = useState<{
-    name: string;
-    x: number;
-    y: number;
-  } | null>(null);
+  const [hoveredPin, setHoveredPin] = useState<{ name: string; x: number; y: number } | null>(null);
   const [activeSlice, setActiveSlice] = useState<number | null>(null);
   const width = 420;
   const height = 210;
 
   const projection = useMemo(
-    () =>
-      geoAlbersUsa()
-        .scale(width * 0.86)
-        .translate([width / 2, height / 2 + 10]),
+    () => geoAlbersUsa().scale(width * 0.86).translate([width / 2, height / 2 + 10]),
     [width, height],
   );
-
   const pathGenerator = useMemo(() => geoPath(projection), [projection]);
 
   useEffect(() => {
     let mounted = true;
-
     fetch("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json")
-      .then((response) => response.json())
+      .then((r) => r.json())
       .then((usAtlas: any) => {
         if (!mounted) return;
         const statesFeature = feature(usAtlas, usAtlas.objects.states) as any;
-        const rawStates: Array<{ id?: string }> = Array.isArray(
-          statesFeature.features,
-        )
-          ? statesFeature.features
-          : [];
+        const rawStates: Array<{ id?: string }> = Array.isArray(statesFeature.features) ? statesFeature.features : [];
         const paths = rawStates
-          .map((state) => {
-            const d = pathGenerator(state as never);
-            if (!d) return null;
-            return { id: String(state.id), d };
-          })
-          .filter((state): state is { id: string; d: string } => state !== null);
+          .map((s) => { const d = pathGenerator(s as never); if (!d) return null; return { id: String(s.id), d }; })
+          .filter((s): s is { id: string; d: string } => s !== null);
         setStatesGeo(paths);
       })
-      .catch(() => {
-        setStatesGeo([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
+      .catch(() => setStatesGeo([]));
+    return () => { mounted = false; };
   }, [pathGenerator]);
 
   const chartData = useMemo<ChartData<"doughnut">>(
     () => ({
-      labels: beyondResumeTimeSplit.map((item) => item.label),
-      datasets: [
-        {
-          data: beyondResumeTimeSplit.map((item) => item.value),
-          backgroundColor: beyondResumeTimeSplit.map((item) => item.color),
-          borderColor: "#FAF0DC",
-          borderWidth: 2,
-          offset: beyondResumeTimeSplit.map((_, idx) =>
-            activeSlice === idx ? 8 : 0,
-          ),
-        },
-      ],
+      labels: beyondResumeTimeSplit.map((i) => i.label),
+      datasets: [{
+        data: beyondResumeTimeSplit.map((i) => i.value),
+        backgroundColor: beyondResumeTimeSplit.map((i) => i.color),
+        borderColor: "rgba(255,255,255,0.08)",
+        borderWidth: 1,
+        offset: beyondResumeTimeSplit.map((_, idx) => activeSlice === idx ? 8 : 0),
+      }],
     }),
     [activeSlice],
   );
@@ -381,253 +351,150 @@ function BeyondResumeSection() {
   const chartOptions = useMemo<ChartOptions<"doughnut">>(
     () => ({
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: true,
       cutout: "56%",
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`,
-          },
-        },
-      },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%` } } },
       animation: { duration: 220 },
     }),
     [],
   );
 
-  const getStarPath = (
-    cx: number,
-    cy: number,
-    outerRadius: number,
-    innerRadius: number,
-  ) => {
-    let d = "";
-    for (let i = 0; i < 10; i += 1) {
-      const angle = (Math.PI / 5) * i - Math.PI / 2;
-      const radius = i % 2 === 0 ? outerRadius : innerRadius;
-      const x = cx + Math.cos(angle) * radius;
-      const y = cy + Math.sin(angle) * radius;
-      d += `${i === 0 ? "M" : "L"} ${x} ${y} `;
-    }
-    return `${d}Z`;
+  const panelStyle: React.CSSProperties = { background: "#2a1510", borderRadius: 8, padding: 18 };
+  const panelLbl: React.CSSProperties = {
+    fontSize: 10, color: "rgba(255,255,255,.38)", letterSpacing: ".13em",
+    fontFamily: "monospace", background: "rgba(255,255,255,.06)",
+    border: "1px solid rgba(255,255,255,.1)", borderRadius: 3,
+    padding: "3px 10px", display: "inline-block", marginBottom: 14,
+    textTransform: "uppercase",
   };
+  const insightStyle: React.CSSProperties = {
+    borderLeft: "2px solid rgba(196,114,100,.45)", background: "rgba(255,255,255,.04)",
+    padding: "7px 12px", fontSize: 13, color: "rgba(255,255,255,.65)",
+    fontStyle: "italic", lineHeight: 1.6,
+  };
+
+  const kpis = [
+    { label: "COUNTRIES INHABITED", value: "4",    sub: "3 continents before 25",               color: "#c47264", sm: false },
+    { label: "US CITIES VISITED",   value: "8+",   sub: "data collection ongoing",              color: "#3d8a6a", sm: false },
+    { label: "OVERFITTING RISK",    value: "LOW",  sub: "generalises well beyond training data", color: "#3d8a6a", sm: true  },
+    { label: "BUG FIX RATE",        value: "133%", sub: "bugs fixed ÷ actually coding",         color: "#d4a800", sm: false },
+  ];
+
+  const insights = [
+    "survived an earthquake and a tsunami before 25. disaster recovery score: excellent.",
+    "NACE-level competitive gaming as team secretary of illinois tech esports. yes, it's on the resume. yes, it counts.",
+    "builds notion dashboards for everything including birthday freebies. the data analyst was not a career choice. it was a diagnosis.",
+  ];
 
   return (
     <section
       id="beyond-resume"
-      className="relative w-full max-w-[100%] scroll-mt-28 overflow-x-hidden bg-[#db5e5e] px-4 pb-20 pt-10 md:px-8 md:pb-24"
+      className="relative w-full scroll-mt-28 bg-[#db5e5e] px-4 py-16 md:px-16"
       aria-label="Beyond the resume"
     >
-      <div className="mx-auto w-full min-w-0 max-w-[1240px]">
-        <div className="mx-auto w-fit max-w-full text-center lg:mx-0 lg:w-fit lg:-rotate-[0.7deg] lg:text-left">
-          <h2
-            className="inline-block max-w-full text-balance whitespace-normal lg:whitespace-nowrap"
-            style={{
-              fontFamily:
-                "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-              fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
-              fontWeight: 800,
-              fontStyle: "italic",
-              color: "#FAF0DC",
-              lineHeight: 1.1,
-              background: "#400909",
-              padding: "8px 14px",
-              display: "inline-block",
-            }}
-          >
-            beyond the resume
-          </h2>
-          <div
-            style={{
-              height: 4,
-              background: "#FAF0DC",
-              marginTop: 6,
-              width: "100%",
-            }}
-          />
-          <p
-            className="mt-2 max-w-full break-words px-0 text-center font-mono text-sm leading-snug text-balance sm:text-base md:text-[18px] lg:text-left"
-            style={{ color: "#ffffff", opacity: 0.8 }}
-          >
-            some data about the human behind the data
-          </p>
+      <div className="mx-auto w-full max-w-[1200px]">
+        {/* Heading */}
+        <div className="mb-8 text-center">
+          <span style={pillStyle}>beyond the resume</span>
+          <p style={secSubStyle}>some data about the human behind the data</p>
         </div>
 
-        <div className="mt-6 grid min-w-0 grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="flex min-w-0 flex-col rounded-[16px] border-[3px] border-[#1a1a1a] bg-[#FAF0DC] p-4 shadow-[4px_4px_0_#1a1a1a] md:p-5">
-            <span className="inline-block rounded bg-[#E8635A] px-3 py-1 font-mono text-[13px] font-bold text-[#FAF0DC]">
-              places i&apos;ve been
-            </span>
-            <div className="relative mt-3 overflow-hidden rounded-[10px] bg-[#FAF0DC]">
-              <svg
-                viewBox={`0 0 ${width} ${height}`}
-                className="h-auto w-full max-w-full"
-                role="img"
-                aria-label="Map of the United States with city pins"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                {statesGeo.map((state) => (
-                  <path
-                    key={state.id}
-                    d={state.d}
-                    fill="#D4534A"
-                    stroke="#FAF0DC"
-                    strokeWidth={0.7}
-                  />
+        {/* DB Header */}
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <span style={{ display: "inline-block", background: "#3d1010", color: "#e8c8c8", fontFamily: "var(--font-playfair),'Playfair Display',serif", fontStyle: "italic", fontSize: 16, fontWeight: 700, padding: "6px 18px", borderRadius: 5 }}>
+            nupur.db
+          </span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.28)", fontFamily: "monospace" }}>
+            source: nupur&apos;s life · refreshed: daily · n is always growing
+          </span>
+        </div>
+
+        {/* KPI Row */}
+        <div className="mb-[14px] grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {kpis.map(({ label, value, sub, color, sm }) => (
+            <div key={label} style={{ background: "#2a1510", borderRadius: 8, padding: "14px 16px", borderTop: `3px solid ${color}` }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".1em", fontFamily: "monospace", marginBottom: 6, textTransform: "uppercase" }}>{label}</div>
+              <div style={{ fontSize: sm ? 22 : 36, fontWeight: 900, color: "#fff", fontFamily: "monospace", lineHeight: 1, paddingTop: sm ? 5 : 0 }}>{value}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", fontStyle: "italic", marginTop: 4, lineHeight: 1.4 }}>{sub}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* DB Grid */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[3fr_2fr]">
+          {/* Map panel */}
+          <div style={panelStyle}>
+            <span style={panelLbl}>PLACES I&apos;VE BEEN</span>
+            <div className="relative">
+              <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label="US map with city pins" preserveAspectRatio="xMidYMid meet">
+                {statesGeo.map((s) => (
+                  <path key={s.id} d={s.d} fill="#3d1a0e" stroke="rgba(196,114,100,0.45)" strokeWidth={0.7} />
                 ))}
                 {beyondResumeCities.map((city) => {
                   const point = projection(city.coords);
                   if (!point) return null;
                   const isActive = hoveredCity === city.name;
                   return (
-                    <g
-                      key={city.name}
-                      className="cursor-pointer transition-all duration-150"
-                      onMouseEnter={() => {
-                        setHoveredCity(city.name);
-                        setHoveredPin({
-                          name: city.name,
-                          x: point[0],
-                          y: point[1],
-                        });
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredCity(null);
-                        setHoveredPin(null);
-                      }}
+                    <g key={city.name} className="cursor-pointer"
+                      onMouseEnter={() => { setHoveredCity(city.name); setHoveredPin({ name: city.name, x: point[0], y: point[1] }); }}
+                      onMouseLeave={() => { setHoveredCity(null); setHoveredPin(null); }}
                     >
-                      {city.isCurrent ? (
-                        <path
-                          d={getStarPath(point[0], point[1], isActive ? 10 : 8, 4.5)}
-                          fill={isActive ? "#1a1a1a" : "#FAF0DC"}
-                          stroke="#1a1a1a"
-                          strokeWidth={1.8}
-                        />
-                      ) : (
-                        <circle
-                          cx={point[0]}
-                          cy={point[1]}
-                          r={isActive ? 8 : 6}
-                          fill={isActive ? "#1a1a1a" : "#FAF0DC"}
-                          stroke="#1a1a1a"
-                          strokeWidth={1.8}
-                        />
-                      )}
+                      <circle cx={point[0]} cy={point[1]} r={isActive ? 8 : 6} fill={city.isCurrent ? "#c47264" : "#3d8a6a"} opacity={0.9} />
                       <circle cx={point[0]} cy={point[1]} r={11} fill="transparent" />
+                      {city.isCurrent && (
+                        <text x={point[0]} y={point[1] + 14} fontSize={10} fill="rgba(255,255,255,0.85)" fontFamily="monospace" fontWeight="bold" textAnchor="middle">Chicago</text>
+                      )}
                     </g>
                   );
                 })}
               </svg>
-              {hoveredPin ? (
-                <div
-                  className="pointer-events-none absolute z-10 rounded bg-[#1a1a1a] px-2 py-1 font-mono text-[11px] text-[#FAF0DC] shadow"
-                  style={{
-                    left: `${(hoveredPin.x / width) * 100}%`,
-                    top: `${(hoveredPin.y / height) * 100}%`,
-                    transform: "translate(-50%, calc(-100% - 6px))",
-                  }}
-                >
+              {hoveredPin && (
+                <div className="pointer-events-none absolute z-10 rounded px-2 py-1 font-mono text-[11px] text-white shadow"
+                  style={{ background: "#3d1010", border: "1px solid rgba(196,114,100,0.4)", left: `${(hoveredPin.x / width) * 100}%`, top: `${(hoveredPin.y / height) * 100}%`, transform: "translate(-50%, calc(-100% - 6px))" }}>
                   {hoveredPin.name}
                 </div>
-              ) : null}
+              )}
             </div>
-            <p className="mt-2 font-mono text-[11px] italic text-[#666]">
-              {hoveredCity ?? "hover over a pin to see the city"}
-            </p>
-
-            <div className="mt-4 flex-1 rounded-[10px] border border-[#1a1a1a]/10 bg-[#f0ead6] p-3">
-              <p className="mb-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#999]">
-                cities logged
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {beyondResumeCities.map((city) => (
-                  <span
-                    key={city.name}
-                    className="inline-flex items-center gap-1 rounded px-2 py-1 font-mono text-[10px]"
-                    style={
-                      city.isCurrent
-                        ? { background: "#1a1a1a", color: "#FAF0DC", fontWeight: 700 }
-                        : { border: "1px solid rgba(26,26,26,0.18)", color: "#555" }
-                    }
-                  >
-                    {city.isCurrent && (
-                      <span style={{ fontSize: 8 }}>★</span>
-                    )}
-                    {city.name}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-3 font-mono text-[9px] text-[#aaa]">
-                n = {beyondResumeCities.length} · data collection ongoing
-              </p>
-            </div>
-
-            <p className="mt-3 font-mono text-[11px] text-[#666]">
-              data gathered from: Nupur&apos;s Life · source: her phone
-            </p>
-          </div>
-
-          <div className="flex min-w-0 flex-col gap-4">
-            <div className="min-w-0 rounded-[16px] border-[3px] border-[#1a1a1a] bg-[#FAF0DC] p-4 shadow-[4px_4px_0_#1a1a1a] md:p-5">
-              <span className="inline-block rounded bg-[#E8635A] px-3 py-1 font-mono text-[13px] font-bold text-[#FAF0DC]">
-                how i spend my time
-              </span>
-              <div className="relative mx-auto mt-2 h-[min(220px,55vw)] w-full max-w-full min-w-0 sm:h-[220px]">
-                <Doughnut
-                  data={chartData}
-                  options={chartOptions}
-                  aria-label="Doughnut chart showing time split"
-                />
-              </div>
-              <div className="mt-3 grid gap-2">
-                {beyondResumeTimeSplit.map((item, idx) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    className="flex items-center gap-2 text-left font-mono text-[12px] text-[#3a3a3a]"
-                    onMouseEnter={() => setActiveSlice(idx)}
-                    onMouseLeave={() => setActiveSlice(null)}
-                    onFocus={() => setActiveSlice(idx)}
-                    onBlur={() => setActiveSlice(null)}
-                  >
-                    <span
-                      className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    {item.label} - {item.value}%
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="min-w-0 rounded-[16px] border-[3px] border-[#1a1a1a] bg-[#FAF0DC] p-4 shadow-[4px_4px_0_#1a1a1a] md:p-5">
-              <span className="inline-block rounded bg-[#E8635A] px-3 py-1 font-mono text-[11px] font-bold text-[#FAF0DC]">
-                fun facts
-              </span>
-              <div className="mt-3 grid gap-2.5">
-                <div className="rounded-r-md border-l-[3px] border-[#E8635A] bg-[#f4e8d0] px-3 py-2">
-                  <p className="font-mono text-[12px] text-[#3a3a3a]">
-                    lived in 4 countries before 25 and survived an earthquake and a tsunami
-                    (turns out i have very good disaster recovery)
-                  </p>
-                </div>
-                <div className="rounded-r-md border-l-[3px] border-[#E8635A] bg-[#f4e8d0] px-3 py-2">
-                  <p className="font-mono text-[12px] text-[#3a3a3a]">
-                    team secretary of Illinois Tech Esports — NACE level competitive gaming
-                    (yes, it&apos;s on my resume. yes, i&apos;m serious. yes, it counts.)
-                  </p>
-                </div>
-                <div className="rounded-r-md border-l-[3px] border-[#E8635A] bg-[#f4e8d0] px-3 py-2">
-                  <p className="font-mono text-[12px] text-[#3a3a3a]">
-                    makes notion dashboards and spreadsheets for everything — including tracking
-                    birthday freebies (the data analyst was not a career choice, it was a
-                    diagnosis)
-                  </p>
-                </div>
-              </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginTop: 8, fontFamily: "monospace" }}>
+              ⬟ home base · ● visited · n = {beyondResumeCities.length} · still counting
             </div>
           </div>
+
+          {/* Right column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Time allocation */}
+            <div style={panelStyle}>
+              <span style={panelLbl}>TIME ALLOCATION</span>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <div style={{ width: 130, height: 130, flexShrink: 0 }}>
+                  <Doughnut data={chartData} options={chartOptions} aria-label="Doughnut chart showing time split" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {beyondResumeTimeSplit.map((item, idx) => (
+                    <button key={item.label} type="button" className="flex w-full items-center gap-[6px] text-left" style={{ marginBottom: 7, background: "none", border: "none", padding: 0, cursor: "default" }}
+                      onMouseEnter={() => setActiveSlice(idx)} onMouseLeave={() => setActiveSlice(null)}>
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, backgroundColor: item.color, display: "inline-block" }} />
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.65)", flex: 1 }}>{item.label}</span>
+                      <span style={{ fontSize: 11, fontFamily: "monospace", color: "rgba(255,255,255,.38)" }}>{item.value}%</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Analyst notes */}
+            <div style={panelStyle}>
+              <span style={panelLbl}>ANALYST NOTES</span>
+              {insights.map((text, i) => (
+                <div key={i} style={{ ...insightStyle, marginBottom: i < insights.length - 1 ? 6 : 0 }}>{text}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* DB Footer */}
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10, fontFamily: "monospace" }}>
+          data quality: mostly reliable · outliers: intentional · confidence interval: 95%
         </div>
       </div>
     </section>
@@ -640,6 +507,19 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
   const fallbackMedia = project.poster ?? project.gif;
 
   return (
+    <div className="relative" style={{ overflow: "visible" }}>
+      {project.achievement && (
+        <div style={{ position: "absolute", top: -11, right: 10, zIndex: 10 }}>
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: 5,
+            padding: "3px 9px", borderRadius: 12,
+            fontSize: 11, fontWeight: 700, whiteSpace: "nowrap",
+            background: project.achievement.color, color: "#fff",
+          }}>
+            {project.achievement.label}
+          </span>
+        </div>
+      )}
     <div
       className="group flex flex-col overflow-hidden rounded-[14px] shadow-[2px_4px_18px_rgba(0,0,0,0.1)] transition-[transform,box-shadow] duration-[250ms] hover:-translate-y-[5px] hover:shadow-[4px_10px_28px_rgba(0,0,0,0.5)]"
       style={{ background: "#0E0808" }}
@@ -748,14 +628,67 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
         </div>
       </div>
     </div>
+    </div>
   );
 }
 
+const pillStyle: React.CSSProperties = {
+  display: "inline-block",
+  background: "#3d1010",
+  color: "#e8c8c8",
+  fontFamily: "var(--font-playfair),'Playfair Display',serif",
+  fontStyle: "italic",
+  fontSize: 22,
+  fontWeight: 700,
+  padding: "11px 32px",
+  borderRadius: 8,
+};
+
+const pillFunStyle: React.CSSProperties = {
+  ...pillStyle,
+  background: "#1a2a3a",
+  color: "#b0c8e8",
+  fontSize: 22,
+  padding: "11px 32px",
+};
+
+const secSubStyle: React.CSSProperties = {
+  fontSize: 13,
+  color: "rgba(255,255,255,0.4)",
+  letterSpacing: "0.14em",
+  fontFamily: "monospace",
+  marginTop: 8,
+  marginBottom: 0,
+  textTransform: "uppercase",
+};
+
+const analyticsProjects = [projects[0]!, projects[1]!, projects[5]!];
+const funProjects = [projects[2]!, projects[3]!, projects[4]!];
+
 function ProjectGrid() {
   return (
-    <div className="mx-auto mt-10 w-full max-w-[1200px] px-3 pb-16 sm:px-5 sm:pb-20 md:px-8 lg:px-[60px] lg:pb-8">
+    <div className="mx-auto mt-4 w-full max-w-[1200px] px-3 pb-16 sm:px-5 sm:pb-20 md:px-8 lg:px-[60px] lg:pb-8">
+      {/* Data & Analytics */}
+      <div className="mb-6 text-center">
+        <span style={pillStyle}>data &amp; analytics projects</span>
+        <p style={secSubStyle}>the work i&apos;d bring to an interview</p>
+      </div>
       <div className="grid grid-cols-1 gap-[22px] sm:grid-cols-2">
-        {projects.map((project) => (
+        {analyticsProjects.map((project) => (
+          <ProjectCard key={project.title} project={project} />
+        ))}
+      </div>
+
+      {/* Divider */}
+      <hr style={{ border: "none", borderTop: "1.5px dashed rgba(255,255,255,0.2)", margin: "36px 0" }} />
+
+      {/* Built for Fun */}
+      <div className="mb-6 text-center">
+        <span style={pillFunStyle}>built for fun</span>
+        <p style={secSubStyle}>things i made because i wanted to — also, i win things sometimes</p>
+      </div>
+      <div className="grid grid-cols-1 gap-[22px] sm:grid-cols-2">
+        {funProjects.map((project) => (
           <ProjectCard key={project.title} project={project} />
         ))}
       </div>
@@ -810,7 +743,10 @@ const SidebarStickerRail = memo(function SidebarStickerRail({
       className="fixed left-0 top-0 z-[240] hidden w-[84px] flex-col items-center overflow-hidden border-r border-white/10 bg-white/12 py-2 lg:flex"
       style={{ top: 0, bottom: 0, overflow: "hidden" }}
     >
-      <p className="mb-3 w-full px-3 pt-2 text-center text-[12px] font-extrabold uppercase leading-none tracking-[0.1em] text-[#f2d9d6]/90">
+      <p
+        className="w-full shrink-0 px-3 text-center text-[12px] font-extrabold uppercase leading-none tracking-[0.1em] text-[#f2d9d6]/90"
+        style={{ height: NAV_BAR_HEIGHT_PX, display: "flex", alignItems: "center", justifyContent: "center", margin: 0 }}
+      >
         STICKERS
       </p>
       <div className="flex w-full flex-col items-center pb-24">
@@ -855,7 +791,6 @@ export default function HeroPage() {
   const [ghostVisible, setGhostVisible] = useState(false);
   const [showStickerHint, setShowStickerHint] = useState<boolean>(true);
   const [viewCount, setViewCount] = useState<number | "loading">("loading");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const SESSION_VIEW_KEY = "portfolio-view-counted-session";
@@ -933,8 +868,6 @@ export default function HeroPage() {
     for (let i = 0; i < SIDEBAR_REPEAT_COUNT; i += 1) list.push(...SIDEBAR_STICKERS);
     return list;
   }, []);
-  const { ref: extrasContainerRef, containerScale: extrasContainerScale } =
-    useContainerScale();
   const { ref: contactContainerRef } = useContainerScale();
 
   useEffect(() => {
@@ -1099,58 +1032,6 @@ export default function HeroPage() {
 
   return (
     <div className="relative min-h-screen w-full select-none bg-[#db5e5e] overflow-y-visible overflow-x-hidden lg:overflow-x-visible">
-      {/* Mobile hamburger — outside zoomed container */}
-      <button
-        type="button"
-        aria-label="Open menu"
-        onClick={() => setMobileMenuOpen(true)}
-        className="fixed right-4 top-4 z-[9999] flex h-14 w-14 flex-col items-center justify-center gap-[5px] rounded-full bg-[#400909] shadow-[0_0_0_3px_#FAF0DC] lg:hidden"
-      >
-        <span className="block h-[2.5px] w-5 rounded-full bg-[#FAF0DC]" />
-        <span className="block h-[2.5px] w-5 rounded-full bg-[#FAF0DC]" />
-        <span className="block h-[2.5px] w-5 rounded-full bg-[#FAF0DC]" />
-      </button>
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[10000] flex flex-col items-center justify-center gap-8 bg-[#400909] lg:hidden"
-          >
-            <button
-              type="button"
-              aria-label="Close menu"
-              onClick={() => setMobileMenuOpen(false)}
-              className="absolute right-4 top-4 flex h-14 w-14 items-center justify-center rounded-full text-3xl font-bold text-[#FAF0DC]"
-            >
-              ×
-            </button>
-            {[
-              { id: "about", label: "ABOUT ME" },
-              { id: "experience", label: "WORK EXPERIENCE" },
-              { id: "personal-projects", label: "PROJECTS" },
-              { id: "extras", label: "EXTRAS" },
-              { id: "contact", label: "CONTACT" },
-            ].map(({ id, label }) => (
-              <a
-                key={id}
-                href={`#${id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setMobileMenuOpen(false);
-                  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="text-center text-[28px] font-extrabold italic text-[#FAF0DC] no-underline"
-                style={{ fontFamily: "'Nunito Sans', sans-serif" }}
-              >
-                {label}
-              </a>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
       {desktopStickers ? (
         <DroppedStickersLayer droppedStickers={droppedStickers} onRemoveSticker={removeSticker} />
       ) : null}
@@ -1210,6 +1091,8 @@ export default function HeroPage() {
         </div>
       ) : null}
 
+      <NavBar />
+
       <div
         className={`relative z-[5] w-full min-w-0 pl-4 pr-4 md:pr-8 ${scale < 1 ? "max-w-none" : "max-w-[100dvw]"}`}
         style={
@@ -1226,100 +1109,67 @@ export default function HeroPage() {
         }
       >
         <div className="relative mx-auto max-w-[1440px]">
-          <motion.div {...fadeFromTop}>
-            <NavBar />
-          </motion.div>
+          <section id="about" className="scroll-mt-20" aria-label="About">
+            {/* Desktop layout */}
+            <div className="relative hidden lg:block" style={{ padding: "48px 64px 48px", maxWidth: 1080, margin: "0 auto" }}>
+              <img
+                src={encodeURI("/images/Star 1.svg")}
+                alt=""
+                width={380}
+                height={380}
+                className="pointer-events-none absolute z-0 opacity-40"
+                style={{ left: 0, top: -20 }}
+              />
+              <motion.div
+                className="relative z-10 flex items-start gap-6"
+                initial={fadeUp.initial}
+                animate={fadeUp.animate}
+                transition={fadeUp.transition}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h1 style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 78, fontWeight: 900, lineHeight: 1, marginBottom: 20, color: "#fff" }}>
+                    Hey!<br />I&apos;m Nupur!
+                  </h1>
 
-          <section id="about" className="scroll-mt-28" aria-label="About">
-            {/* Desktop-2 artboard: fixed 1440px canvas (scrolls horizontally if needed) */}
-            <div className="relative hidden min-h-[780] overflow-x-clip overflow-y-visible lg:block">
-              <div className="relative min-h-[780] min-w-[1440px]">
-                {/* Subtle hero star backdrop */}
-                <img
-                  src={encodeURI("/images/Star 1.svg")}
-                  alt=""
-                  width={440}
-                  height={440}
-                  className="pointer-events-none absolute z-[0] opacity-40"
-                  style={{ left: 220, top: -2 }}
-                />
-                {/* eslint-disable-next-line @next/next/no-img-element -- Desktop-2 spec: native <img> */}
-                <img
-                  src="/images/quote-open.svg"
-                  alt=""
-                  width={106}
-                  height={82}
-                  className="pointer-events-none absolute z-[1]"
-                  style={{ left: 114, top: 30 }}
-                />
+                  {/* Cred badge */}
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 24, padding: "8px 20px", marginBottom: 18 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Data Analytics &amp; Engineering</span>
+                    <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>·</span>
+                    <span style={{ fontSize: 14, color: "rgba(255,255,255,0.75)" }}>MS CS · Illinois Tech</span>
+                  </div>
 
-                <motion.h1
-                  className="absolute z-[2] font-sans text-[100px] font-extrabold italic leading-none text-[#1e1e1e]"
-                  style={{ left: 220, top: 50, maxWidth: 900 }}
-                  initial={fadeUp.initial}
-                  animate={fadeUp.animate}
-                  transition={fadeUp.transition}
-                >
-                  <span className="block">Hey!</span>
-                  <span className="mt-2 block">I&apos;m Nupur!</span>
-                </motion.h1>
+                  {/* Bio */}
+                  <p style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, color: "rgba(255,255,255,0.88)", lineHeight: 1.75, fontStyle: "italic", marginBottom: 18, maxWidth: 520, display: "block" }}>
+                    I turn messy data into decisions people actually act on — with a background spanning software engineering, analytics, and consulting. If the dashboard doesn&apos;t tell a story, I&apos;m already redesigning it.
+                  </p>
 
+                  {/* Tool pills */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 18 }}>
+                    {aboutTechStack.map((t) => (
+                      <span key={t} style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.22)", borderRadius: 14, padding: "5px 15px", fontSize: 13, fontWeight: 600, color: "#fff" }}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Scrapbook line */}
+                  <p style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontStyle: "italic", fontSize: 16, color: "rgba(255,255,255,0.55)" }}>
+                    &ldquo;this portfolio is a scrapbook of what I&apos;ve built, learned, and enjoyed along the way.&rdquo;
+                  </p>
+                </div>
+
+                {/* Right: polaroid */}
                 <motion.div
-                  className="absolute z-[2] text-center font-sans text-[20px] font-extrabold italic leading-snug text-white"
-                  style={{ left: 172, top: 280, width: 665 }}
-                  initial={fadeUp.initial}
-                  animate={fadeUp.animate}
-                  transition={{ ...fadeUp.transition, delay: 0.08 }}
-                >
-                  {bioParagraphs.map((text, i) => (
-                    <p key={i} className={i > 0 ? "mt-6" : ""}>
-                      {text}
-                    </p>
-                  ))}
-                </motion.div>
-
-                {/* eslint-disable-next-line @next/next/no-img-element -- Desktop-2 spec: native <img> */}
-                <img
-                  src="/images/quote-close.svg"
-                  alt=""
-                  width={98}
-                  height={80}
-                  className="pointer-events-none absolute z-[1]"
-                  style={{ left: 671, top: 630 }}
-                />
-
-                <motion.div
-                  className="absolute right-0 top-[12px] flex items-start justify-end "
+                  style={{ flexShrink: 0 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={
                     glowActive
-                      ? {
-                        opacity: 1,
-                        y: 0,
-                        filter: [
-                          "drop-shadow(0 0 8px rgba(255,255,255,0.4))",
-                          "drop-shadow(0 0 20px rgba(255,255,255,0.7))",
-                          "drop-shadow(0 0 8px rgba(255,255,255,0.4))",
-                        ],
-                      }
-                      : {
-                        opacity: 1,
-                        y: 0,
-                        filter: "drop-shadow(0 0 0px rgba(255,255,255,0))",
-                      }
+                      ? { opacity: 1, y: 0, filter: ["drop-shadow(0 0 8px rgba(255,255,255,0.4))", "drop-shadow(0 0 20px rgba(255,255,255,0.7))", "drop-shadow(0 0 8px rgba(255,255,255,0.4))"] }
+                      : { opacity: 1, y: 0, filter: "drop-shadow(0 0 0px rgba(255,255,255,0))" }
                   }
                   transition={
                     glowActive
-                      ? {
-                        opacity: { duration: 0.6, delay: 0.2 },
-                        y: { duration: 0.6, delay: 0.2 },
-                        filter: {
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: 0.2,
-                        },
-                      }
+                      ? { opacity: { duration: 0.6, delay: 0.2 }, y: { duration: 0.6, delay: 0.2 }, filter: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.2 } }
                       : { duration: 0.15 }
                   }
                 >
@@ -1327,14 +1177,15 @@ export default function HeroPage() {
                   <img
                     src="/images/hero/polaroid-frame.png"
                     alt="Photos"
-                    className="h-auto max-h-[min(86vh,760px)] w-auto max-w-full object-contain"
+                    className="h-auto w-auto object-contain"
+                    style={{ maxHeight: "min(86vh, 560px)" }}
                   />
                 </motion.div>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Smaller viewports: stacked layout */}
-            <div className="relative flex flex-col gap-10 px-4 pb-8 pt-20 lg:hidden">
+            {/* Mobile layout */}
+            <div className="relative flex flex-col gap-5 px-5 pb-8 pt-20 lg:hidden">
               <img
                 src={encodeURI("/images/Star 1.svg")}
                 alt=""
@@ -1342,75 +1193,54 @@ export default function HeroPage() {
                 height={280}
                 className="pointer-events-none absolute left-1/2 top-4 z-0 w-[min(78vw,260px)] max-w-[280px] -translate-x-1/2 opacity-40"
               />
-              {/* eslint-disable-next-line @next/next/no-img-element -- Desktop-2 spec: native <img> */}
-              <img
-                src="/images/quote-open.svg"
-                alt=""
-                width={106}
-                height={82}
-                className="mx-auto w-20 max-w-full sm:w-auto"
-              />
-              <motion.h1
-                className="text-center font-sans text-5xl font-extrabold italic leading-none text-[#1e1e1e] sm:text-6xl md:text-7xl"
+              <motion.div
+                className="relative z-10 flex flex-col gap-4"
                 initial={fadeUp.initial}
                 animate={fadeUp.animate}
                 transition={fadeUp.transition}
               >
-                <span className="block">Hey!</span>
-                <span className="mt-2 block">I&apos;m Nupur!</span>
-              </motion.h1>
-              <motion.div
-                className="mx-auto w-full max-w-[min(665px,100%)] px-1 text-center font-sans text-base font-extrabold italic leading-snug text-white sm:px-0 sm:text-lg"
-                initial={fadeUp.initial}
-                animate={fadeUp.animate}
-                transition={{ ...fadeUp.transition, delay: 0.08 }}
-              >
-                {bioParagraphs.map((text, i) => (
-                  <p key={i} className={i > 0 ? "mt-5" : ""}>
-                    {text}
-                  </p>
-                ))}
+                <h1 style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: "clamp(48px,12vw,72px)", fontWeight: 900, lineHeight: 1, color: "#fff" }}>
+                  Hey!<br />I&apos;m Nupur!
+                </h1>
+
+                {/* Cred badge */}
+                <div style={{ display: "inline-flex", alignItems: "center", flexWrap: "wrap", gap: 8, background: "rgba(0,0,0,0.22)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 24, padding: "8px 18px", alignSelf: "flex-start" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Data Analytics &amp; Engineering</span>
+                  <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>·</span>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>MS CS · Illinois Tech</span>
+                </div>
+
+                {/* Bio */}
+                <p style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 16, color: "rgba(255,255,255,0.88)", lineHeight: 1.75, fontStyle: "italic" }}>
+                  I turn messy data into decisions people actually act on — with a background spanning software engineering, analytics, and consulting. If the dashboard doesn&apos;t tell a story, I&apos;m already redesigning it.
+                </p>
+
+                {/* Tool pills */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                  {aboutTechStack.map((t) => (
+                    <span key={t} style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.22)", borderRadius: 14, padding: "5px 14px", fontSize: 13, fontWeight: 600, color: "#fff" }}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Scrapbook line */}
+                <p style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontStyle: "italic", fontSize: 15, color: "rgba(255,255,255,0.55)" }}>
+                  &ldquo;this portfolio is a scrapbook of what I&apos;ve built, learned, and enjoyed along the way.&rdquo;
+                </p>
               </motion.div>
-              {/* eslint-disable-next-line @next/next/no-img-element -- Desktop-2 spec: native <img> */}
-              <img
-                src="/images/quote-close.svg"
-                alt=""
-                width={98}
-                height={80}
-                className="mx-auto w-20 max-w-full sm:w-auto"
-              />
+
               <motion.div
                 className="flex justify-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={
                   glowActive
-                    ? {
-                      opacity: 1,
-                      y: 0,
-                      filter: [
-                        "drop-shadow(0 0 8px rgba(255,255,255,0.4))",
-                        "drop-shadow(0 0 20px rgba(255,255,255,0.7))",
-                        "drop-shadow(0 0 8px rgba(255,255,255,0.4))",
-                      ],
-                    }
-                    : {
-                      opacity: 1,
-                      y: 0,
-                      filter: "drop-shadow(0 0 0px rgba(255,255,255,0))",
-                    }
+                    ? { opacity: 1, y: 0, filter: ["drop-shadow(0 0 8px rgba(255,255,255,0.4))", "drop-shadow(0 0 20px rgba(255,255,255,0.7))", "drop-shadow(0 0 8px rgba(255,255,255,0.4))"] }
+                    : { opacity: 1, y: 0, filter: "drop-shadow(0 0 0px rgba(255,255,255,0))" }
                 }
                 transition={
                   glowActive
-                    ? {
-                      opacity: { duration: 0.6, delay: 0.2 },
-                      y: { duration: 0.6, delay: 0.2 },
-                      filter: {
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: 0.2,
-                      },
-                    }
+                    ? { opacity: { duration: 0.6, delay: 0.2 }, y: { duration: 0.6, delay: 0.2 }, filter: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.2 } }
                     : { duration: 0.15 }
                 }
               >
@@ -1427,146 +1257,18 @@ export default function HeroPage() {
           </section>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[1440px] bg-[#db5e5e] lg:-mt-20">
-          {/* Scrapbook intro quote — bridges About Me and Projects */}
-          <div className="relative bg-[#db5e5e] py-8 lg:py-0">
-            <div className="relative mx-auto hidden max-w-[1440px] overflow-visible lg:block">
-              <div className="relative min-h-[420px] min-w-[1440px]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/quote-open.svg"
-                  alt=""
-                  width={106}
-                  height={82}
-                  className="pointer-events-none absolute z-[1]"
-                  style={{ left: 250, top: 31 }}
-                />
-
-                <div
-                  className="absolute z-[2] text-center font-sans text-white"
-                  style={{
-                    left: "50%",
-                    top: 82,
-                    width: 693,
-                    transform: "translateX(-50%) rotate(-0.16deg)",
-                  }}
-                >
-                  <p className="text-[20px] font-bold italic leading-snug">
-                    {"this portfolio is a bit of a "}
-                    <span className="text-[32px] font-black italic">
-                      scrapbook
-                    </span>
-                    {" of what I've built, learned, and enjoyed along the way."}
-                  </p>
-                  <p className="mt-8 text-[20px] font-extrabold italic leading-snug">
-                    {"Please take a look around."}
-                  </p>
-                </div>
-
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/quote-close.svg"
-                  alt=""
-                  width={98}
-                  height={80}
-                  className="pointer-events-none absolute z-[1]"
-                  style={{
-                    left: 1091,
-                    top: 180,
-                    transform: "rotate(180deg) scaleX(-1)",
-                  }}
-                />
-
-                <p
-                  className="absolute z-[2] text-center font-sans text-[32px] font-bold italic leading-snug text-white"
-                  style={{
-                    left: "50%",
-                    top: 312,
-                    width: 709,
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  {"alright, let's get into it."}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-6 px-4 py-10 lg:hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/quote-open.svg"
-                alt=""
-                width={106}
-                height={82}
-                className="w-20 max-w-full sm:w-auto"
-              />
-              <div className="mx-auto max-w-[min(693px,100%)] px-1 text-center font-sans text-white">
-                <p className="text-base font-bold italic leading-snug sm:text-[20px]">
-                  {"this portfolio is a bit of a "}
-                  <span className="text-2xl font-black italic sm:text-[32px]">
-                    scrapbook
-                  </span>
-                  {" of what I've built, learned, and enjoyed along the way."}
-                </p>
-                <p className="mt-8 text-base font-extrabold italic leading-snug sm:text-[20px]">
-                  {"Please take a look around."}
-                </p>
-              </div>
-              <p className="max-w-[709px] text-center font-sans text-xl font-bold italic leading-snug text-white sm:text-[32px]">
-                {"alright, let's get into it."}
-              </p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/quote-close.svg"
-                alt=""
-                width={98}
-                height={80}
-                className="mt-8 w-20 max-w-full rotate-180 -scale-x-100 sm:mt-12 sm:w-auto"
-              />
-            </div>
+        <div className="relative mx-auto w-full max-w-[1440px] bg-[#db5e5e]">
+          <div className="bg-[#db5e5e] px-8 pb-2 pt-6 text-center">
+            <p style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontStyle: "italic", fontSize: 14, color: "rgba(255,255,255,0.55)", margin: 0, letterSpacing: "0.02em" }}>
+              alright, let&apos;s get into it.
+            </p>
           </div>
 
           <section
             id="personal-projects"
-            className="relative mb-0 scroll-mt-28 bg-[#db5e5e] px-4 pb-12 pt-[40px] md:px-8 md:pb-16 lg:pb-10 lg:pt-[60px]"
+            className="relative mb-0 scroll-mt-28 bg-[#db5e5e] pb-12 pt-3 md:pb-16 lg:pb-10 lg:pt-3"
             aria-label="Personal projects"
           >
-            <div className="relative z-[1] mx-auto w-full min-w-0 max-w-[1440px]">
-              <div className="mx-auto w-fit max-w-full text-center lg:-rotate-[0.5deg]">
-                <h2
-                  className="inline-block max-w-full text-balance whitespace-normal lg:whitespace-nowrap"
-                  style={{
-                    fontFamily:
-                      "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                    fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
-                    fontWeight: 800,
-                    fontStyle: "italic",
-                    color: "#FAF0DC",
-                    lineHeight: 1.1,
-                    background: "#400909",
-                    padding: "8px 14px",
-                    display: "inline-block",
-                  }}
-                >
-                  personal projects
-                </h2>
-                <div
-                  style={{
-                    height: 4,
-                    background: "#FAF0DC",
-                    marginTop: 6,
-                    width: "100%",
-                  }}
-                />
-                <p
-                  className="mt-2 text-center font-mono text-[18px]"
-                  style={{ color: "#ffffff", opacity: 0.8 }}
-                >
-                  things i built because i wanted to
-                </p>
-              </div>
-            </div>
-
             <ProjectGrid />
           </section>
 
@@ -1582,20 +1284,22 @@ export default function HeroPage() {
                   <h2
                     className="inline-block"
                     style={{
-                      fontFamily: "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                      fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
-                      fontWeight: 800,
+                      fontFamily: "var(--font-playfair),'Playfair Display',serif",
+                      fontSize: 28,
+                      fontWeight: 700,
                       fontStyle: "italic",
-                      color: "#FAF0DC",
-                      lineHeight: 1.1,
-                      background: "#400909",
-                      padding: "8px 14px",
+                      color: "#e8c8c8",
+                      background: "#3d1010",
+                      padding: "9px 28px",
+                      borderRadius: 6,
                       display: "inline-block",
                     }}
                   >
-                    WORK EXPERIENCE
+                    work experience
                   </h2>
-                  <div style={{ height: 4, background: "#FAF0DC", marginTop: 6, width: "100%" }} />
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", letterSpacing: "0.14em", fontFamily: "monospace", marginTop: 6, textTransform: "uppercase" }}>
+                    where i&apos;ve been, what i&apos;ve built
+                  </p>
                 </div>
               </div>
 
@@ -1610,7 +1314,7 @@ export default function HeroPage() {
                     top: 0,
                     bottom: 0,
                     width: 2,
-                    background: "rgba(44,14,14,0.35)",
+                    background: "rgba(255,255,255,0.18)",
                     transform: "translateX(-50%)",
                     pointerEvents: "none",
                   }}
@@ -1618,16 +1322,16 @@ export default function HeroPage() {
 
                 {/* ── HEARTLAND ── */}
                 <div style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 36 }}>
-                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 11, background: "#400909", color: "#FAF0DC", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 13, fontWeight: 700, background: "#3d1010", color: "#e8c8c8", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.11em" }}>
                     AUG 2025 – PRESENT
                   </span>
                 </div>
 
                 <div className="mb-14 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Senior Consultant</div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>Heartland Community Network</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Senior Consultant</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>Heartland Community Network</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
                       🌍 Clients across finance, healthcare, public safety &amp; small businesses
                     </div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
@@ -1635,16 +1339,16 @@ export default function HeroPage() {
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["SQL", "Power BI", "Python", "KPI Design", "Data Governance", "Stakeholder Mgmt"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
-                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
                   {/* HCN photo mosaic — exact Figma positions (frame 591×778) */}
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
-                  <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                     {/* Indiana SBDC logo */}
                     <div style={{ position: "absolute", top: "11.83%", right: "69.04%", bottom: "78.28%", left: "15.91%" }}>
                       <img src="/images/hcn/logo-indiana.png" alt="Indiana SBDC" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
@@ -1659,15 +1363,15 @@ export default function HeroPage() {
                     </div>
                     {/* Right photo — HCN materials */}
                     <div style={{ position: "absolute", top: "26.35%", right: "14.89%", bottom: "50.64%", left: "52.28%" }}>
-                      <img src="/images/hcn/photo-materials.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <img src="/images/hcn/photo-materials.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                     </div>
                     {/* Left photo — meeting */}
                     <div style={{ position: "absolute", top: "29.31%", right: "51.78%", bottom: "44.86%", left: "13.54%" }}>
-                      <img src="/images/hcn/photo-meeting1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <img src="/images/hcn/photo-meeting1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                     </div>
                     {/* Bottom-right photo — Nupur */}
                     <div style={{ position: "absolute", top: "62.98%", right: "14.89%", bottom: "10.67%", left: "53.13%" }}>
-                      <img src="/images/hcn/photo-nupur.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <img src="/images/hcn/photo-nupur.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                     </div>
                     {/* Bottom-left photo — library (with original Figma clip offset) */}
                     <div style={{ position: "absolute", top: "58.23%", right: "55.33%", bottom: "12.21%", left: "13.87%", overflow: "hidden" }}>
@@ -1675,7 +1379,7 @@ export default function HeroPage() {
                     </div>
                     {/* Middle-right photo — office */}
                     <div style={{ position: "absolute", top: "45.5%", right: "22.17%", bottom: "32.65%", left: "50.08%" }}>
-                      <img src="/images/hcn/photo-office.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <img src="/images/hcn/photo-office.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                     </div>
                     {/* Footer watermark */}
                     <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
@@ -1686,27 +1390,27 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mb-10 flex flex-col gap-4 lg:hidden">
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "11.83%", right: "69.04%", bottom: "78.28%", left: "15.91%" }}><img src="/images/hcn/logo-indiana.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "11.83%", right: "49.92%", bottom: "78.28%", left: "35.03%" }}><img src="/images/hcn/logo-iu.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "11.7%", right: "30.8%", bottom: "78.41%", left: "54.15%" }}><img src="/images/hcn/logo-cook.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
-                      <div style={{ position: "absolute", top: "26.35%", right: "14.89%", bottom: "50.64%", left: "52.28%" }}><img src="/images/hcn/photo-materials.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "29.31%", right: "51.78%", bottom: "44.86%", left: "13.54%" }}><img src="/images/hcn/photo-meeting1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "62.98%", right: "14.89%", bottom: "10.67%", left: "53.13%" }}><img src="/images/hcn/photo-nupur.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "26.35%", right: "14.89%", bottom: "50.64%", left: "52.28%" }}><img src="/images/hcn/photo-materials.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "29.31%", right: "51.78%", bottom: "44.86%", left: "13.54%" }}><img src="/images/hcn/photo-meeting1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "62.98%", right: "14.89%", bottom: "10.67%", left: "53.13%" }}><img src="/images/hcn/photo-nupur.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "58.23%", right: "55.33%", bottom: "12.21%", left: "13.87%", overflow: "hidden" }}><img src="/images/hcn/photo-library.png" alt="" style={{ position: "absolute", width: "100%", height: "140.63%", top: "-10.32%", left: 0, objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "45.5%", right: "22.17%", bottom: "32.65%", left: "50.08%" }}><img src="/images/hcn/photo-office.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                      <div style={{ position: "absolute", top: "45.5%", right: "22.17%", bottom: "32.65%", left: "50.08%" }}><img src="/images/hcn/photo-office.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>HEARTLAND COMMUNITY NETWORK</div>
                     </div>
                   </div>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Senior Consultant</div>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Senior Consultant</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Heartland Community Network</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>🌍 Clients across finance, healthcare, public safety &amp; small businesses</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>🌍 Clients across finance, healthcare, public safety &amp; small businesses</div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>Build analytical models, define KPIs, and create dashboards that help people actually make decisions — not just look at numbers. Set up data governance standards, because if the data isn&apos;t reliable, nothing downstream is.</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["SQL", "Power BI", "Python", "KPI Design", "Data Governance", "Stakeholder Mgmt"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
@@ -1714,32 +1418,32 @@ export default function HeroPage() {
 
                 {/* ── OCT 2024 ── */}
                 <div style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 36, marginTop: 12 }}>
-                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 11, background: "#400909", color: "#FAF0DC", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 13, fontWeight: 700, background: "#3d1010", color: "#e8c8c8", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.11em" }}>
                     OCT 2024 – MAY 2025
                   </span>
                 </div>
 
                 <div className="mb-10 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
                   {/* CPS photo mosaic — exact Figma positions (frame 619×856) */}
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}>
-                        <img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "35.08%", right: "58.08%", bottom: "39.13%", left: "16.01%" }}>
-                        <img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "69.95%", right: "11.94%", bottom: "9.84%", left: "42.21%" }}>
-                        <img src="/images/cps/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/cps/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "54.86%", right: "34.79%", bottom: "28.31%", left: "42.21%" }}>
-                        <img src="/images/cps/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/cps/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "63.28%", right: "60.7%", bottom: "12.13%", left: "13.54%" }}>
-                        <img src="/images/cps/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/cps/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "33.77%", right: "15.72%", bottom: "45.14%", left: "45.27%" }}>
-                        <img src="/images/cps/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/cps/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
                         CHICAGO PUBLIC SCHOOLS
@@ -1747,12 +1451,12 @@ export default function HeroPage() {
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
-                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Graduate Student Assistant</div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>Chicago Public Schools — Administrative Testing Staff</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Graduate Student Assistant</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>Chicago Public Schools — Administrative Testing Staff</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
                       📋 5,000+ student records managed across multiple school sites
                     </div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
@@ -1760,17 +1464,17 @@ export default function HeroPage() {
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["Data Validation", "Excel", "Variance Analysis", "Process Improvement"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
                 </div>
 
                 <div className="mb-14 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Data Science Consultant</div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>The Build Fellowship</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Data Science Consultant</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>The Build Fellowship</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
                       💡 First time I realized data storytelling was the part I loved most
                     </div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
@@ -1778,24 +1482,24 @@ export default function HeroPage() {
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["Predictive Modeling", "Python", "Dashboards", "Data Storytelling"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
-                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
                   {/* Build Fellowship photo mosaic — exact Figma positions (frame 687×915) */}
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}>
-                        <img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "62.62%", right: "13.25%", bottom: "10.38%", left: "20.23%" }}>
-                        <img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "46.89%", right: "13.25%", bottom: "32.35%", left: "46.14%" }}>
-                        <img src="/images/build/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/build/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
                         THE BUILD FELLOWSHIP
@@ -1805,44 +1509,44 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mb-10 flex flex-col gap-6 lg:hidden">
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
-                      <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}><img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "35.08%", right: "58.08%", bottom: "39.13%", left: "16.01%" }}><img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "69.95%", right: "11.94%", bottom: "9.84%", left: "42.21%" }}><img src="/images/cps/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "54.86%", right: "34.79%", bottom: "28.31%", left: "42.21%" }}><img src="/images/cps/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "63.28%", right: "60.7%", bottom: "12.13%", left: "13.54%" }}><img src="/images/cps/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "33.77%", right: "15.72%", bottom: "45.14%", left: "45.27%" }}><img src="/images/cps/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
+                      <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}><img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "35.08%", right: "58.08%", bottom: "39.13%", left: "16.01%" }}><img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "69.95%", right: "11.94%", bottom: "9.84%", left: "42.21%" }}><img src="/images/cps/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "54.86%", right: "34.79%", bottom: "28.31%", left: "42.21%" }}><img src="/images/cps/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "63.28%", right: "60.7%", bottom: "12.13%", left: "13.54%" }}><img src="/images/cps/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "33.77%", right: "15.72%", bottom: "45.14%", left: "45.27%" }}><img src="/images/cps/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>CHICAGO PUBLIC SCHOOLS</div>
                     </div>
                   </div>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Graduate Student Assistant</div>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Graduate Student Assistant</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Chicago Public Schools — Administrative Testing Staff</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>📋 5,000+ student records managed across multiple school sites</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>📋 5,000+ student records managed across multiple school sites</div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>{cpsDescription}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["Data Validation", "Excel", "Variance Analysis", "Process Improvement"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
-                      <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}><img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "62.62%", right: "13.25%", bottom: "10.38%", left: "20.23%" }}><img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "46.89%", right: "13.25%", bottom: "32.35%", left: "46.14%" }}><img src="/images/build/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
+                      <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}><img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "62.62%", right: "13.25%", bottom: "10.38%", left: "20.23%" }}><img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "46.89%", right: "13.25%", bottom: "32.35%", left: "46.14%" }}><img src="/images/build/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>THE BUILD FELLOWSHIP</div>
                     </div>
                   </div>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Data Science Consultant</div>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Data Science Consultant</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>The Build Fellowship</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>💡 First time I realized data storytelling was the part I loved most</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>💡 First time I realized data storytelling was the part I loved most</div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>{dataScienceConsultantDescriptionFirstParagraph}{" "}{dataScienceConsultantDescriptionSecondParagraph}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["Predictive Modeling", "Python", "Dashboards", "Data Storytelling"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
@@ -1850,35 +1554,35 @@ export default function HeroPage() {
 
                 {/* ── INFOSYS ── */}
                 <div style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 36, marginTop: 12 }}>
-                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 11, background: "#400909", color: "#FAF0DC", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                  <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: 13, fontWeight: 700, background: "#3d1010", color: "#e8c8c8", padding: "6px 20px", borderRadius: 20, letterSpacing: "0.11em" }}>
                     2019 – 2023 · INFOSYS
                   </span>
                 </div>
 
                 <div className="hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
                   {/* Infosys photo mosaic — exact Figma positions (frame 661×896) */}
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)", position: "relative" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}>
-                        <img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "38.36%", right: "54.29%", bottom: "29.29%", left: "13.1%" }}>
-                        <img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "75.85%", right: "33.19%", bottom: "6.01%", left: "21.11%" }}>
-                        <img src="/images/infosys/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "43.28%", right: "11.06%", bottom: "38.14%", left: "51.82%" }}>
-                        <img src="/images/infosys/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "69.29%", right: "66.38%", bottom: "17.6%", left: "7.28%" }}>
-                        <img src="/images/infosys/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "58.8%", right: "8.15%", bottom: "10.6%", left: "55.17%" }}>
-                        <img src="/images/infosys/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", top: "57.16%", right: "48.62%", bottom: "26.99%", left: "30.42%" }}>
-                        <img src="/images/infosys/photo7.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src="/images/infosys/photo7.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                       </div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: "clamp(7px, 1.4%, 10px)", letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>
                         INFOSYS LIMITED
@@ -1886,11 +1590,11 @@ export default function HeroPage() {
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
-                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#C9973E", border: "3px solid #db5e5e", boxShadow: "0 0 0 2px rgba(44,14,14,0.5)", flexShrink: 0 }} />
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 19, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Technology Analyst</div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: "#C9973E", marginBottom: 12 }}>Infosys Limited · Solvay Client · Bangalore</div>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Technology Analyst</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>Infosys Limited · Solvay Client · Bangalore</div>
                     {/* Role progression */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
                       {[
@@ -1899,12 +1603,12 @@ export default function HeroPage() {
                         { label: "Technology Analyst", active: true },
                       ].map(({ label, active }, i, arr) => (
                         <div key={label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span style={{ fontFamily: "monospace", fontSize: 10, padding: "3px 9px", borderRadius: 4, color: active ? "#C9973E" : "rgba(250,240,220,0.45)", background: active ? "rgba(201,151,62,0.15)" : "rgba(250,240,220,0.05)", border: active ? "1px solid rgba(201,151,62,0.4)" : "1px solid rgba(250,240,220,0.1)", fontWeight: active ? 700 : 400 }}>{label}</span>
+                          <span style={{ fontFamily: "monospace", fontSize: 10, padding: "3px 9px", borderRadius: 4, color: active ? "#c47264" : "rgba(255,255,255,0.42)", background: active ? "rgba(196,114,100,0.15)" : "rgba(255,255,255,0.05)", border: active ? "1px solid rgba(196,114,100,0.4)" : "1px solid rgba(255,255,255,0.1)", fontWeight: active ? 700 : 400 }}>{label}</span>
                           {i < arr.length - 1 && <span style={{ color: "rgba(250,240,220,0.25)", fontSize: 10 }}>→</span>}
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "3px solid #C9973E" }}>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
                       🏆 RISE Award — Best Team, Project Excellence (FY24)
                     </div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 14 }}>
@@ -1912,27 +1616,27 @@ export default function HeroPage() {
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["AWS", "Cloud Systems", "Automation", "Enterprise Clients", "ITIL V4"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4 lg:hidden">
-                  <div style={{ padding: 10, background: "linear-gradient(135deg, #6b2e0e 0%, #3a1508 100%)", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(80,30,20,0.35)" }}>
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#221008" }}>
-                      <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}><img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "38.36%", right: "54.29%", bottom: "29.29%", left: "13.1%" }}><img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "75.85%", right: "33.19%", bottom: "6.01%", left: "21.11%" }}><img src="/images/infosys/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "43.28%", right: "11.06%", bottom: "38.14%", left: "51.82%" }}><img src="/images/infosys/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "69.29%", right: "66.38%", bottom: "17.6%", left: "7.28%" }}><img src="/images/infosys/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "58.8%", right: "8.15%", bottom: "10.6%", left: "55.17%" }}><img src="/images/infosys/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
-                      <div style={{ position: "absolute", top: "57.16%", right: "48.62%", bottom: "26.99%", left: "30.42%" }}><img src="/images/infosys/photo7.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                    <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
+                      <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}><img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "38.36%", right: "54.29%", bottom: "29.29%", left: "13.1%" }}><img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "75.85%", right: "33.19%", bottom: "6.01%", left: "21.11%" }}><img src="/images/infosys/photo3.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "43.28%", right: "11.06%", bottom: "38.14%", left: "51.82%" }}><img src="/images/infosys/photo4.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "69.29%", right: "66.38%", bottom: "17.6%", left: "7.28%" }}><img src="/images/infosys/photo5.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "58.8%", right: "8.15%", bottom: "10.6%", left: "55.17%" }}><img src="/images/infosys/photo6.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                      <div style={{ position: "absolute", top: "57.16%", right: "48.62%", bottom: "26.99%", left: "30.42%" }}><img src="/images/infosys/photo7.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>INFOSYS LIMITED</div>
                     </div>
                   </div>
-                  <div style={{ background: "rgba(82,38,12,0.88)", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
-                    <div style={{ fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontSize: 17, fontWeight: 700, color: "#FAF0DC", marginBottom: 3 }}>Technology Analyst</div>
+                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                    <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Technology Analyst</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Infosys Limited · 2019–2023</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10, flexWrap: "wrap" }}>
                       {[
@@ -1941,16 +1645,16 @@ export default function HeroPage() {
                         { label: "Technology Analyst", active: true },
                       ].map(({ label, active }, i, arr) => (
                         <div key={label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                          <span style={{ fontFamily: "monospace", fontSize: 9, padding: "2px 7px", borderRadius: 4, color: active ? "#C9973E" : "rgba(250,240,220,0.45)", background: active ? "rgba(201,151,62,0.15)" : "rgba(250,240,220,0.05)", border: active ? "1px solid rgba(201,151,62,0.4)" : "1px solid rgba(250,240,220,0.1)", fontWeight: active ? 700 : 400 }}>{label}</span>
+                          <span style={{ fontFamily: "monospace", fontSize: 9, padding: "2px 7px", borderRadius: 4, color: active ? "#c47264" : "rgba(255,255,255,0.42)", background: active ? "rgba(196,114,100,0.15)" : "rgba(255,255,255,0.05)", border: active ? "1px solid rgba(196,114,100,0.4)" : "1px solid rgba(255,255,255,0.1)", fontWeight: active ? 700 : 400 }}>{label}</span>
                           {i < arr.length - 1 && <span style={{ color: "rgba(250,240,220,0.25)", fontSize: 9 }}>→</span>}
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(201,151,62,0.12)", color: "rgba(250,240,220,0.85)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "3px solid #C9973E" }}>🏆 RISE Award — Best Team, Project Excellence (FY24)</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>🏆 RISE Award — Best Team, Project Excellence (FY24)</div>
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(250,240,220,0.65)", marginBottom: 12 }}>{infosysDescriptionFirstParagraph}{" "}{infosysDescriptionSecondParagraph}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                       {["AWS", "Cloud Systems", "Automation", "Enterprise Clients", "ITIL V4"].map((t) => (
-                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(201,151,62,0.12)", color: "#C9973E", border: "1px solid rgba(201,151,62,0.25)" }}>{t}</span>
+                        <span key={t} style={{ fontFamily: "monospace", fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
@@ -1967,47 +1671,10 @@ export default function HeroPage() {
           >
             <div className="relative mx-auto w-full max-w-[1440px]">
               <div className="relative mx-auto max-w-[1120px]">
-                <motion.div
-                  initial={{ opacity: 0, y: 14 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.45, ease: "easeOut" }}
-                  className="mx-auto w-fit lg:mx-0 lg:pl-32 lg:pr-[220px]"
-                >
-                  <div className="mx-auto w-fit max-w-full text-center lg:mx-0 lg:rotate-[0.3deg] lg:text-left">
-                    <h2
-                      className="inline-block max-w-full text-balance whitespace-normal lg:whitespace-nowrap"
-                      style={{
-                        fontFamily:
-                          "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                        fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
-                        fontWeight: 800,
-                        fontStyle: "italic",
-                        color: "#FAF0DC",
-                        lineHeight: 1.1,
-                        background: "#400909",
-                        padding: "8px 14px",
-                        display: "inline-block",
-                      }}
-                    >
-                      certifications &amp; skills
-                    </h2>
-                    <div
-                      style={{
-                        height: 4,
-                        background: "#FAF0DC",
-                        marginTop: 6,
-                        width: "100%",
-                      }}
-                    />
-                    <p
-                      className="mt-2 text-center font-mono text-[18px] lg:text-left"
-                      style={{ color: "#ffffff", opacity: 0.8 }}
-                    >
-                      Spent a lot of time getting these certifications and skills
-                    </p>
-                  </div>
-                </motion.div>
+                <div className="mb-8 text-center">
+                  <span style={pillStyle}>certifications &amp; skills</span>
+                  <p style={secSubStyle}>yes, i actually did all of these — the stickers are proof</p>
+                </div>
 
                 <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1.1fr_0.7fr]">
                   <motion.div
@@ -2017,37 +1684,51 @@ export default function HeroPage() {
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.45, delay: 0.05, ease: "easeOut" }}
                   >
-                    <p className="mx-auto mb-2 max-w-[36ch] rotate-[-5deg] text-center font-sans text-[14px] font-extrabold italic leading-snug text-white md:text-[22px]">
-                      Stickers don&apos;t lie. My laptop is basically my CV at
-                      this point. The full list is on my resume. This is just the
-                      fun version.
+                    <p className="mx-auto mb-2 text-center font-sans text-[14px] font-extrabold italic leading-snug text-white md:text-[22px]">
+                      Stickers don&apos;t lie. My laptop is basically my CV.
                     </p>
+
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 14 }}>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", fontFamily: "monospace", letterSpacing: "0.04em" }}>Full list on my resume</span>
+                      <a
+                        href="/resume/Nupur-Gudigar-Resume.pdf"
+                        download="Nupur-Gudigar-Resume.pdf"
+                        aria-label="Download resume"
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#3d0909", color: "#fff", borderRadius: 20, padding: "6px 16px", fontSize: 13, fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textDecoration: "none", border: "1px solid #5b1111", whiteSpace: "nowrap" }}
+                      >
+                        ↓ Download Resume
+                      </a>
+                    </div>
+
                     {/* SVG laptop with interactive hover zones over each sticker */}
-                    <div style={{ position: "relative", maxWidth: 778 }}>
+                    <div style={{ position: "relative", maxWidth: 829 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={encodeURI("/images/Component 22.svg")}
                         alt="Laptop with skill stickers and technology logos"
-                        width={778}
-                        height={576}
+                        width={829}
+                        height={648}
                         className="h-auto w-full object-contain"
                       />
-                      {/* Hover zones — positions as % of SVG 778×576 viewBox */}
+                      {/* Hover zones — positions as % of SVG 829×648 viewBox */}
                       {([
-                        { label: "Python",       left: "6.7%",  top: "17.9%", w: "18.5%", h: "14.1%" },
-                        { label: "R",            left: "33.0%", top: "15.8%", w: "10.3%", h: "11.8%" },
-                        { label: "Tableau",      left: "51.2%", top: "17.4%", w: "19.9%", h: "15.1%" },
-                        { label: "Google Cloud", left: "9.3%",  top: "31.6%", w: "21.7%", h: "16.5%" },
-                        { label: "Jupyter",      left: "10.4%", top: "68.2%", w: "12.5%", h: "19.6%" },
-                        { label: "AWS",          left: "55.7%", top: "45.0%", w: "19.9%", h: "15.1%" },
-                        { label: "AWS (alt)",    left: "34.8%", top: "33.3%", w: "20.1%", h: "15.3%" },
-                        { label: "GitHub",       left: "24.9%", top: "55.7%", w: "9.9%",  h: "12.5%" },
-                        { label: "Excel",        left: "53.2%", top: "62.3%", w: "15.4%", h: "20.8%" },
-                        { label: "CSS",          left: "34.8%", top: "55.7%", w: "9.9%",  h: "12.5%" },
-                        { label: "JS",           left: "43.3%", top: "55.7%", w: "9.9%",  h: "12.5%" },
-                        { label: "HTML",         left: "9.5%",  top: "47.9%", w: "12.9%", h: "14.6%" },
-                        { label: "SQL",          left: "50.4%", top: "7.6%",  w: "10.8%", h: "12.5%" },
-                        { label: "Power BI",     left: "29.9%", top: "69.6%", w: "10.0%", h: "15.1%" },
+                        { label: "Python",       left: "11.2%", top: "16.4%", w: "17.4%", h: "12.5%" },
+                        { label: "R",            left: "36.3%", top: "17.7%", w: "9.7%",  h: "10.5%" },
+                        { label: "Tableau",      left: "53.1%", top: "21.1%", w: "18.7%", h: "13.4%" },
+                        { label: "Google Cloud", left: "13.1%", top: "29.0%", w: "20.4%", h: "14.7%" },
+                        { label: "Jupyter",      left: "11.8%", top: "61.5%", w: "11.7%", h: "17.4%" },
+                        { label: "AWS",          left: "55.6%", top: "46.0%", w: "14.0%", h: "10.1%" },
+                        { label: "AWS Cloud",    left: "36.8%", top: "33.4%", w: "16.8%", h: "12.8%" },
+                        { label: "GitHub",       left: "24.8%", top: "52.9%", w: "10.3%", h: "7.7%"  },
+                        { label: "Sticker",      left: "43.2%", top: "66.5%", w: "10.3%", h: "13.1%" },
+                        { label: "CSS",          left: "35.4%", top: "53.2%", w: "10.3%", h: "7.7%"  },
+                        { label: "JavaScript",   left: "43.3%", top: "54.2%", w: "9.5%",  h: "9.7%"  },
+                        { label: "HTML",         left: "12.2%", top: "43.5%", w: "12.1%", h: "13.0%" },
+                        { label: "SQL",          left: "53.0%", top: "12.4%", w: "10.1%", h: "11.1%" },
+                        { label: "Power BI",     left: "29.9%", top: "65.0%", w: "9.4%",  h: "13.4%" },
+                        { label: "Excel",        left: "72.3%", top: "65.0%", w: "15.0%", h: "13.3%" },
+                        { label: "Git",          left: "75.6%", top: "19.3%", w: "10.4%", h: "10.0%" },
+                        { label: "Sticker 2",    left: "72.6%", top: "36.1%", w: "13.4%", h: "9.9%"  },
                       ] as const).map(({ label, left, top, w, h }) => (
                         <div
                           key={label}
@@ -2072,15 +1753,6 @@ export default function HeroPage() {
                         />
                       ))}
                     </div>
-
-                    <a
-                      href="/resume/Nupur-Gudigar-Resume.pdf"
-                      download="Nupur-Gudigar-Resume.pdf"
-                      aria-label="Download resume"
-                      className="mx-auto mt-10 inline-flex w-fit translate-x-[2.25rem] items-center justify-center rounded-full border border-[#5b1111] bg-[#3d0909] px-9 py-3 font-sans text-[19px] font-extrabold italic leading-tight tracking-wide text-white shadow-[0_6px_14px_rgba(40,4,4,0.35)] transition duration-200 md:translate-x-28 lg:translate-x-40 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#db5e5e] md:text-[21px]"
-                    >
-                      DOWNLOAD RESUME
-                    </a>
                   </motion.div>
 
                   <motion.div
@@ -2100,22 +1772,6 @@ export default function HeroPage() {
                         className="h-auto w-full object-contain"
                       />
                       {/* Cert stamp overlays — coords are % of SVG viewBox 390×840, width extends to cover logo + text */}
-                      {[
-                        { label: "Certification 1", href: "#", left: "13%", top: "48.69%", width: "74%", height: "14.17%" },
-                        { label: "Certification 2", href: "#", left: "13%", top: "62.86%", width: "74%", height: "8.21%" },
-                        { label: "Certification 3", href: "#", left: "13%", top: "69.76%", width: "74%", height: "14.17%" },
-                        { label: "Certification 4", href: "#", left: "16%", top: "83.93%", width: "71%", height: "10.60%" },
-                      ].map((cert) => (
-                        <a
-                          key={cert.label}
-                          href={cert.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Verify ${cert.label}`}
-                          className="absolute rounded transition-all duration-200 hover:ring-2 hover:ring-white/60"
-                          style={{ left: cert.left, top: cert.top, width: cert.width, height: cert.height }}
-                        />
-                      ))}
                     </div>
 
                     <p className="mt-4 text-center font-sans text-[28px] font-extrabold italic leading-tight text-white md:text-[36px]">
@@ -2130,907 +1786,174 @@ export default function HeroPage() {
           <BeyondResumeSection />
 
           {/* -- EXTRAS -- */}
-          <div className="bg-[#db5e5e] px-4 pb-6 pt-10 text-center lg:hidden">
-            <div className="mx-auto w-fit max-w-full">
-              <h2
-                className="inline-block max-w-full text-balance whitespace-normal"
-                style={{
-                  fontFamily:
-                    "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                  fontSize: "clamp(1.35rem, 4vw, 2.5rem)",
-                  fontWeight: 800,
-                  fontStyle: "italic",
-                  color: "#FAF0DC",
-                  lineHeight: 1.1,
-                  background: "#400909",
-                  padding: "8px 14px",
-                  display: "inline-block",
-                }}
-              >
-                life outside the terminal
-              </h2>
+          <section
+            id="extras"
+            className="scroll-mt-28 bg-[#db5e5e] px-4 py-14 md:px-8 lg:px-14"
+          >
+            <div className="mx-auto w-full max-w-[1200px]">
+              <div className="mb-10 text-center">
+                <span style={pillStyle}>life outside the terminal</span>
+                <p style={secSubStyle}>psst... hover over the photos to flip them</p>
+              </div>
               <div
-                className="mx-auto"
                 style={{
-                  height: 4,
-                  background: "#FAF0DC",
-                  marginTop: 6,
-                  width: "100%",
-                  maxWidth: "min(100%, 28rem)",
-                }}
-              />
-              <p
-                className="mt-3 font-mono text-sm italic text-[#FAF0DC]/80"
-              >
-                Tap a photo to flip it (desktop: hover works too).
-              </p>
-            </div>
-          </div>
-          <div ref={extrasContainerRef} style={{ width: "100%" }}>
-            <div
-              style={{
-                width: "100%",
-                height: 1024 * extrasContainerScale,
-                overflow: "visible",
-                backgroundColor: "#db5e5e",
-                margin: 0,
-                padding: 0,
-              }}
-            >
-              <div
-                id="extras"
-                className="scroll-mt-28"
-                style={{
-                  width: 1440,
-                  height: 1024,
-                  position: "relative",
-                  transformOrigin: "top left",
-                  transform: `scale(${extrasContainerScale})`,
+                  background: "#1a0f0a",
+                  borderRadius: 12,
+                  padding: "36px 24px 28px",
+                  border: "1px solid rgba(255,255,255,.06)",
                 }}
               >
-                {/* Corkboard */}
-                <img
-                  src="/images/Rectangle_89.png"
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 196,
-                    top: 132,
-                    width: 1315,
-                    height: 863,
-                    objectFit: "contain",
-                  }}
-                />
-                {/* Photo container - clips to inner cork area */}
-                <div
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 135,
-                    top: 135,
-                    width: 1250,
-                    height: 800,
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 157,
-                      top: 76,
-                      width: 411,
-                      height: 211,
-                      zIndex: 1,
-                      transform: "rotate(-2deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Component 15.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Gaming Club Secretary
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Leading the gaming community as secretary — organizing
-                          events, tournaments, and bringing gamers together.
-                        </p>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+
+                  {/* Card 1: Nupur info */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ background: "#8b1a1a", borderRadius: 8, padding: "28px 22px 24px", minHeight: 200, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)" }}>
+                      <p style={{ fontSize: 10, color: "rgba(255,210,200,.5)", fontFamily: "monospace", letterSpacing: ".13em", textTransform: "uppercase", margin: 0 }}>the human</p>
+                      <h3 style={{ fontSize: 22, fontWeight: 800, color: "#faf0dc", fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", fontStyle: "italic", margin: 0, textAlign: "center" }}>Nupur Gudigar</h3>
+                      <p style={{ fontSize: 13, color: "rgba(255,210,200,.75)", fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", margin: 0, textAlign: "center", lineHeight: 1.5 }}>
+                        Data Analyst · Chicago, IL<br />MS Data Science @ IIT
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Gaming Club */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Component 15.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Gaming Club Secretary</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Leading the gaming community — organizing events, tournaments, and bringing gamers together.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 613,
-                      top: 68,
-                      width: 209,
-                      height: 325,
-                      zIndex: 2,
-                      transform: "rotate(1.5deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Rectangle 68.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          PAWS Chicago Volunteer
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Volunteering at PAWS Chicago, helping rescue animals find
-                          their forever homes.
-                        </p>
+
+                  {/* Card 3: PAWS Chicago */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Rectangle 68.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>PAWS Chicago Volunteer</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Volunteering at PAWS Chicago, helping rescue animals find their forever homes.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 157,
-                      top: 324,
-                      width: 394,
-                      height: 266,
-                      zIndex: 1,
-                      transform: "rotate(-1deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Rectangle 66.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Illinois Esports
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Competing and collaborating in the Illinois esports scene —
-                          where passion meets strategy.
-                        </p>
+
+                  {/* Card 4: Illinois Esports */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Rectangle 66.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Illinois Esports</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Competing in the Illinois esports scene — where passion meets strategy.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 632,
-                      top: 417,
-                      width: 242,
-                      height: 185,
-                      zIndex: 2,
-                      transform: "rotate(2deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Rectangle 67.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Furry Friend
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          A wholesome encounter with this adorable service dog who
-                          brightened everyone&apos;s day.
-                        </p>
+
+                  {/* Card 5: Furry Friend */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Rectangle 67.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Furry Friend</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>A wholesome encounter with this adorable service dog who brightened everyone&apos;s day.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 1010,
-                      top: 111,
-                      width: 265,
-                      height: 245,
-                      zIndex: 1,
-                      transform: "rotate(-1.5deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Rectangle 65.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Google Visit
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Exploring Google&apos;s office and getting inspired by the
-                          culture of innovation.
-                        </p>
+
+                  {/* Card 6: Google Visit */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Rectangle 65.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Google Visit</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Exploring Google&apos;s office and getting inspired by the culture of innovation.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 916,
-                      top: 256,
-                      width: 209,
-                      height: 322,
-                      zIndex: 2,
-                      transform: "rotate(1deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Rectangle 64.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Google Chicago
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Visiting Google&apos;s Chicago office — a day full of learning
-                          and inspiration.
-                        </p>
+
+                  {/* Card 7: Google Chicago */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Rectangle 64.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Google Chicago</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Visiting Google&apos;s Chicago office — a day full of learning and inspiration.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 932,
-                      top: 524,
-                      width: 356,
-                      height: 185,
-                      zIndex: 1,
-                      transform: "rotate(-0.5deg)",
-                      perspective: "1000px",
-                    }}
-                  >
-                    <div
-                      className="group"
-                      style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                        transition:
-                          "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transformStyle: "preserve-3d",
-                        transform: "rotateX(0deg)",
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "rotateX(180deg)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "rotateX(0deg)";
-                      }}
-                      onClick={toggleExtrasFlipOnTouch}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                        }}
-                      >
-                        <img
-                          src={encodeURI("/images/Rectangle 63.svg")}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          backfaceVisibility: "hidden",
-                          transform: "rotateX(180deg)",
-                          backgroundColor: "#f2f2f2",
-                          borderRadius: 2,
-                          boxShadow: "3px 4px 8px rgba(0, 0, 0, 0.35)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 20,
-                        }}
-                      >
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 18,
-                            color: "#333",
-                            fontWeight: 700,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          Team Photo
-                        </h4>
-                        <p
-                          style={{
-                            marginTop: 10,
-                            fontSize: 13,
-                            color: "#777",
-                            lineHeight: 1.4,
-                            fontFamily: "Nunito Sans, sans-serif",
-                            textAlign: "center",
-                          }}
-                        >
-                          A snapshot with an amazing group of peers and mentors who made
-                          the journey memorable.
-                        </p>
+
+                  {/* Card 8: Team Photo */}
+                  <div style={{ position: "relative", paddingTop: 14 }}>
+                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 18, height: 18, borderRadius: "50%", background: "#c0392b", zIndex: 2, boxShadow: "0 2px 8px rgba(0,0,0,.6)" }} />
+                    <div style={{ perspective: "1000px" }}>
+                      <div style={{ position: "relative", height: 200, transition: "transform 0.85s cubic-bezier(0.4, 0, 0.2, 1)", transformStyle: "preserve-3d", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateX(180deg)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateX(0deg)"; }}
+                        onClick={toggleExtrasFlipOnTouch}>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 8, overflow: "hidden", boxShadow: "0 4px 16px rgba(0,0,0,.4)", background: "#0d0705" }}>
+                          <img src={encodeURI("/images/Rectangle 63.svg")} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                        </div>
+                        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateX(180deg)", background: "#2a1510", borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 18px" }}>
+                          <h4 style={{ margin: 0, fontSize: 17, color: "#e8c8c8", fontWeight: 700, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>Team Photo</h4>
+                          <p style={{ marginTop: 10, fontSize: 13, color: "rgba(232,200,200,.7)", lineHeight: 1.5, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", textAlign: "center" }}>A snapshot with amazing peers and mentors who made the journey memorable.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                {/* Pushpins — one per photo, positioned near top-center of each */}
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 470,
-                    top: 175,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 810,
-                    top: 165,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 440,
-                    top: 425,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 845,
-                    top: 515,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 1230,
-                    top: 210,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 1110,
-                    top: 355,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                <img
-                  src={encodeURI("/images/Rectangle 96.svg")}
-                  alt=""
-                  className="max-lg:-translate-x-[135px]"
-                  style={{
-                    position: "absolute",
-                    left: 1210,
-                    top: 625,
-                    width: 78,
-                    height: 87,
-                    zIndex: 5,
-                  }}
-                />
-                {/* Title — typography matches Projects section heading */}
-                <div
-                  className="hidden lg:block"
-                  style={{
-                    position: "absolute",
-                    top: 40,
-                    left: 300,
-                    width: "fit-content",
-                    transform: "rotate(0.4deg)",
-                  }}
-                >
-                  <h2
-                    style={{
-                      fontFamily:
-                        "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
-                      fontSize: 40,
-                      fontWeight: 800,
-                      fontStyle: "italic",
-                      color: "#FAF0DC",
-                      lineHeight: 1.1,
-                      background: "#400909",
-                      padding: "8px 20px",
-                      display: "inline-block",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    life outside the terminal
-                  </h2>
-                  <div
-                    style={{
-                      height: 4,
-                      background: "#FAF0DC",
-                      marginTop: 6,
-                      width: "100%",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontFamily: "monospace",
-                      fontSize: 18,
-                      color: "rgba(250, 240, 220, 0.8)",
-                      fontStyle: "italic",
-                      marginTop: 8,
-                    }}
-                  >
-                    psst... hover over the photos to flip them
-                  </p>
+
                 </div>
               </div>
             </div>
-          </div>
-
+          </section>
           {/* -- CONTACT -- */}
           <div id="contact" className="scroll-mt-28" ref={contactContainerRef} style={{ width: "100%", backgroundColor: "#db5e5e", display: "flex", flexDirection: "column" }}>
             {/* Main contact grid */}
@@ -3042,6 +1965,7 @@ export default function HeroPage() {
                   <img
                     src={encodeURI("/images/Rectangle 151.svg")}
                     alt="Phone"
+                    className="self-start lg:self-auto"
                     style={{
                       height: 300,
                       width: "auto",
@@ -3050,6 +1974,7 @@ export default function HeroPage() {
                     }}
                   />
                   <div
+                    className="ml-8 lg:ml-16"
                     style={{
                       fontFamily: "var(--font-nunito), 'Nunito Sans', system-ui, sans-serif",
                       fontSize: "clamp(28px, 4vw, 42px)",
@@ -3062,13 +1987,13 @@ export default function HeroPage() {
                       display: "inline-block",
                       marginTop: -36,
                       marginBottom: 10,
-                      marginLeft: 64,
                       lineHeight: 1.1,
                     }}
                   >
                     let&apos;s talk!!
                   </div>
                   <p
+                    className="ml-8 lg:ml-0"
                     style={{
                       fontFamily: "monospace",
                       fontSize: 13,
@@ -3104,62 +2029,66 @@ export default function HeroPage() {
                     {" "}especially in healthcare and manufacturing. I build things that make data actually useful to the people who need it. I also actually reply.
                   </div>
 
-                  {/* 2×2 contact cards — original SVG designs, uniform size */}
-                  <div className="mb-[22px] grid grid-cols-2 gap-x-[14px] gap-y-[14px]">
+                  {/* Contact cards — vertical stack */}
+                  <div className="mb-[22px] flex flex-col gap-3">
                     {(
                       [
-                        { href: "https://github.com/Nupur-Gudigar",               src: "/images/Component 17.svg", alt: "GitHub",  newTab: true  },
-                        { href: "https://discord.com/users/422368252531048469",    src: "/images/Component 18.svg", alt: "Discord", newTab: true  },
-                        { href: "mailto:nupurgudigar.tech@gmail.com",             src: "/images/Component 19.svg", alt: "Email",   newTab: false },
-                        { href: "https://www.linkedin.com/in/nupur-gudigar",      src: "/images/Component 20.svg", alt: "LinkedIn",newTab: true  },
+                        {
+                          href: "https://www.linkedin.com/in/nupur-gudigar",
+                          newTab: true,
+                          bg: "#1a3a5c",
+                          icon: "🔗",
+                          label: "LINKEDIN",
+                          name: "Nupur Gudigar",
+                          sub: "Let's build something together.",
+                        },
+                        {
+                          href: "mailto:nupurgudigar.tech@gmail.com",
+                          newTab: false,
+                          bg: "#2a1510",
+                          icon: "✉️",
+                          label: "EMAIL",
+                          name: "nupurgudigar.tech@gmail.com",
+                          sub: "I actually reply.",
+                        },
+                        {
+                          href: "https://github.com/Nupur-Gudigar",
+                          newTab: true,
+                          bg: "#161b22",
+                          icon: "🐱",
+                          label: "GITHUB",
+                          name: "~/nupurgudigar",
+                          sub: "$ git connect --me",
+                        },
                       ] as const
-                    ).map(({ href, src, alt, newTab }) => (
+                    ).map(({ href, newTab, bg, icon, label, name, sub }) => (
                       <a
-                        key={alt}
+                        key={label}
                         href={href}
                         target={newTab ? "_blank" : undefined}
                         rel={newTab ? "noopener noreferrer" : undefined}
-                        className={`flex transition-[filter] duration-300 hover:brightness-110`}
                         style={{
+                          display: "flex", alignItems: "center", gap: 13,
+                          background: bg, borderRadius: 10, padding: "12px 15px",
                           textDecoration: "none",
-                          overflow: "visible",
-                          alignItems: "center",
+                          transition: "transform 0.2s ease",
                         }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateX(5px)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "translateX(0)"; }}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={encodeURI(src)}
-                          alt={alt}
-                          style={{
-                            maxWidth: "100%",
-                            maxHeight: "100%",
-                            objectFit: "contain",
-                            transform: alt === "Email" || alt === "GitHub" ? "scale(1.35)" : undefined,
-                          }}
-                        />
+                        <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(255,255,255,.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16 }}>
+                          {icon}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 7, color: "rgba(255,255,255,.35)", letterSpacing: ".13em", fontFamily: "monospace", marginBottom: 2, textTransform: "uppercase" }}>{label}</div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "#fff", marginBottom: 1, fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</div>
+                          <div style={{ fontSize: 9, color: "rgba(255,255,255,.45)", fontStyle: "italic", fontFamily: "var(--font-nunito),'Nunito Sans',sans-serif" }}>{sub}</div>
+                        </div>
+                        <span style={{ color: "rgba(255,255,255,.22)", fontSize: 16, flexShrink: 0 }}>→</span>
                       </a>
                     ))}
                   </div>
 
-                  {/* End pill */}
-                  <div style={{ textAlign: "center" }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 8,
-                        background: "rgba(44,14,14,0.3)",
-                        border: "1px solid rgba(44,14,14,0.45)",
-                        padding: "8px 18px",
-                        borderRadius: 8,
-                        fontFamily: "monospace",
-                        fontSize: 12,
-                        color: "#FAF0DC",
-                      }}
-                    >
-                      🎮 Achievement Made!&nbsp;&nbsp;The End?
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -3171,8 +2100,8 @@ export default function HeroPage() {
       <div
         className="w-full lg:ml-[84px] lg:w-[calc(100%-84px)]"
         style={{
-          borderTop: "1px solid rgba(255,255,255,0.18)",
-          padding: "16px 40px 20px",
+          borderTop: "1px solid rgba(255,255,255,0.12)",
+          padding: "20px 40px 24px",
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
@@ -3180,15 +2109,17 @@ export default function HeroPage() {
           gap: 10,
         }}
       >
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#2a1510", borderRadius: 22, padding: "7px 18px" }}>
+          <span style={{ fontSize: 16 }}>🎮</span>
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,.65)", fontFamily: "monospace", letterSpacing: ".06em" }}>Achievement Made!&nbsp;&nbsp;The End?</span>
+        </div>
         <p
           style={{
             margin: 0,
-            fontSize: 13,
-            fontFamily: "var(--font-nunito), 'Nunito Sans', sans-serif",
+            fontSize: 10.5,
+            fontFamily: "var(--font-playfair),'Playfair Display',serif",
             fontStyle: "italic",
-            fontWeight: 700,
-            color: "#f7ecec",
-            lineHeight: 1.2,
+            color: "rgba(255,255,255,.38)",
             textAlign: "center",
           }}
         >
