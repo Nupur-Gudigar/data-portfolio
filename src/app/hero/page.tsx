@@ -1677,13 +1677,7 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1.1fr_0.7fr]">
-                  <motion.div
-                    className="mt-5 lg:mt-20"
-                    initial={{ opacity: 0, y: 18 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.45, delay: 0.05, ease: "easeOut" }}
-                  >
+                  <div className="mt-5 lg:mt-20">
                     <p className="mx-auto mb-2 text-center font-sans text-[14px] font-extrabold italic leading-snug text-white md:text-[22px]">
                       Stickers don&apos;t lie. My laptop is basically my CV.
                     </p>
@@ -1753,15 +1747,9 @@ export default function HeroPage() {
                         />
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
 
-                  <motion.div
-                    className="mx-auto w-full max-w-[340px] lg:-mt-8"
-                    initial={{ opacity: 0, y: 18 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.45, delay: 0.12, ease: "easeOut" }}
-                  >
+                  <div className="mx-auto w-full max-w-[340px] lg:-mt-8">
                     <div className="relative">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -1777,7 +1765,7 @@ export default function HeroPage() {
                     <p className="mt-4 text-center font-sans text-[28px] font-extrabold italic leading-tight text-white md:text-[36px]">
                       I&apos;M CERTIFIED TOO
                     </p>
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </div>
