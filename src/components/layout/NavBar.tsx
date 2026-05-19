@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 /** Fixed nav height; keep hero main wrapper `paddingTop` in sync. */
-export const NAV_BAR_HEIGHT_PX = 76;
+export const NAV_BAR_HEIGHT_PX = 44;
 
 export function NavBar() {
   const [activeSection, setActiveSection] = useState<string>("about");
@@ -73,7 +73,7 @@ export function NavBar() {
   const separatorStyle: React.CSSProperties = {
     color: "rgba(255,255,255,0.18)",
     userSelect: "none",
-    fontSize: 11,
+    fontSize: 10,
   };
 
   const navLinks = [
@@ -106,7 +106,7 @@ export function NavBar() {
           style={{
             fontFamily: "var(--font-nunito), Nunito Sans, system-ui, sans-serif",
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 9,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
           }}

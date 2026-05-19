@@ -180,7 +180,7 @@ const SIDEBAR_STICKERS = [
 ] as const;
 const SIDEBAR_REPEAT_COUNT = 18;
 const SIDEBAR_ROTATION = [-8, 5, -4, 7, -6, 4, -5, 8, -7, 3, -6, 6] as const;
-const SIDEBAR_WIDTH = [44, 46, 42, 48, 45, 50, 44, 47, 42, 48, 45, 49] as const;
+const SIDEBAR_WIDTH = [62, 64, 60, 66, 63, 68, 62, 65, 60, 66, 63, 67] as const;
 const SIDEBAR_X_SHIFT = [-3, 2, -1, 3, -2, 2, -1, 3, -3, 1, -2, 2] as const;
 const SIDEBAR_GAP = [8, 10, 6, 12, 8, 10, 7, 11, 7, 10, 8, 12] as const;
 
@@ -740,16 +740,16 @@ const SidebarStickerRail = memo(function SidebarStickerRail({
 }) {
   return (
     <aside
-      className="fixed left-0 top-0 z-[240] hidden w-[84px] flex-col items-center overflow-hidden border-r border-white/10 bg-white/12 py-2 lg:flex"
-      style={{ top: 0, bottom: 0, overflow: "hidden" }}
+      className="absolute left-0 top-0 z-[240] hidden w-[84px] flex-col items-center overflow-hidden border-r border-white/10 bg-white/12 lg:flex"
+      style={{ top: 0, bottom: 0 }}
     >
       <p
-        className="w-full shrink-0 px-3 text-center text-[12px] font-extrabold uppercase leading-none tracking-[0.1em] text-[#f2d9d6]/90"
-        style={{ height: NAV_BAR_HEIGHT_PX, display: "flex", alignItems: "center", justifyContent: "center", margin: 0 }}
+        className="fixed left-0 w-[84px] shrink-0 px-3 text-center text-[12px] font-extrabold uppercase leading-none tracking-[0.1em] text-[#f2d9d6]/90 border-r border-white/10 bg-[rgba(26,6,6,0.92)]"
+        style={{ height: NAV_BAR_HEIGHT_PX, display: "flex", alignItems: "center", justifyContent: "center", margin: 0, zIndex: 241 }}
       >
         STICKERS
       </p>
-      <div className="flex w-full flex-col items-center pb-24">
+      <div className="flex w-full flex-col items-center pb-24" style={{ paddingTop: NAV_BAR_HEIGHT_PX }}>
         {repeatedSidebarStickers.map((src, index) => {
           const variant = index % SIDEBAR_STICKERS.length;
           return (
@@ -1111,7 +1111,7 @@ export default function HeroPage() {
         <div className="relative mx-auto max-w-[1440px]">
           <section id="about" className="scroll-mt-20" aria-label="About">
             {/* Desktop layout */}
-            <div className="relative hidden lg:block" style={{ padding: "48px 64px 48px", maxWidth: 1080, margin: "0 auto" }}>
+            <div className="relative hidden lg:block" style={{ padding: "48px 64px 48px", maxWidth: 1200, margin: "0 auto" }}>
               <img
                 src={encodeURI("/images/Star 1.svg")}
                 alt=""
@@ -1328,7 +1328,7 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mb-14 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Senior Consultant</div>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>Heartland Community Network</div>
                     <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
@@ -1347,7 +1347,7 @@ export default function HeroPage() {
                     <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
                   {/* HCN photo mosaic — exact Figma positions (frame 591×778) */}
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
                   <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                     {/* Indiana SBDC logo */}
                     <div style={{ position: "absolute", top: "11.83%", right: "69.04%", bottom: "78.28%", left: "15.91%" }}>
@@ -1390,7 +1390,7 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mb-10 flex flex-col gap-4 lg:hidden">
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "591 / 778", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "11.83%", right: "69.04%", bottom: "78.28%", left: "15.91%" }}><img src="/images/hcn/logo-indiana.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "11.83%", right: "49.92%", bottom: "78.28%", left: "35.03%" }}><img src="/images/hcn/logo-iu.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
@@ -1403,7 +1403,7 @@ export default function HeroPage() {
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>HEARTLAND COMMUNITY NETWORK</div>
                     </div>
                   </div>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Senior Consultant</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Heartland Community Network</div>
                     <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>🌍 Clients across finance, healthcare, public safety &amp; small businesses</div>
@@ -1425,7 +1425,7 @@ export default function HeroPage() {
 
                 <div className="mb-10 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
                   {/* CPS photo mosaic — exact Figma positions (frame 619×856) */}
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}>
                         <img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
@@ -1453,7 +1453,7 @@ export default function HeroPage() {
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
                     <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Graduate Student Assistant</div>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>Chicago Public Schools — Administrative Testing Staff</div>
                     <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
@@ -1471,7 +1471,7 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mb-14 hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Data Science Consultant</div>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>The Build Fellowship</div>
                     <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 12, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
@@ -1490,7 +1490,7 @@ export default function HeroPage() {
                     <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
                   {/* Build Fellowship photo mosaic — exact Figma positions (frame 687×915) */}
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}>
                         <img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
@@ -1509,7 +1509,7 @@ export default function HeroPage() {
                 </div>
 
                 <div className="mb-10 flex flex-col gap-6 lg:hidden">
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "619 / 856", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "7.76%", right: "15.72%", bottom: "67.98%", left: "15.72%" }}><img src="/images/cps/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "35.08%", right: "58.08%", bottom: "39.13%", left: "16.01%" }}><img src="/images/cps/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
@@ -1520,7 +1520,7 @@ export default function HeroPage() {
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>CHICAGO PUBLIC SCHOOLS</div>
                     </div>
                   </div>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Graduate Student Assistant</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Chicago Public Schools — Administrative Testing Staff</div>
                     <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>📋 5,000+ student records managed across multiple school sites</div>
@@ -1531,7 +1531,7 @@ export default function HeroPage() {
                       ))}
                     </div>
                   </div>
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "687 / 915", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "9.18%", right: "18.2%", bottom: "60.22%", left: "14.12%" }}><img src="/images/build/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "62.62%", right: "13.25%", bottom: "10.38%", left: "20.23%" }}><img src="/images/build/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
@@ -1539,7 +1539,7 @@ export default function HeroPage() {
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>THE BUILD FELLOWSHIP</div>
                     </div>
                   </div>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Data Science Consultant</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>The Build Fellowship</div>
                     <div style={{ fontFamily: "monospace", fontSize: 12, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", padding: "7px 12px", borderRadius: 6, marginBottom: 10, borderLeft: "2px solid rgba(255,255,255,0.25)" }}>💡 First time I realized data storytelling was the part I loved most</div>
@@ -1561,7 +1561,7 @@ export default function HeroPage() {
 
                 <div className="hidden items-start lg:grid" style={{ gridTemplateColumns: "1fr 56px 1fr", gap: "0 16px" }}>
                   {/* Infosys photo mosaic — exact Figma positions (frame 661×896) */}
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)", position: "relative" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}>
                         <img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
@@ -1592,7 +1592,7 @@ export default function HeroPage() {
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 22 }}>
                     <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.42)", border: "2px solid rgba(255,255,255,0.7)", boxShadow: "0 0 0 2px rgba(196,114,100,0.3)", flexShrink: 0 }} />
                   </div>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 22, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Technology Analyst</div>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "#c47264", marginBottom: 12 }}>Infosys Limited · Solvay Client · Bangalore</div>
                     {/* Role progression */}
@@ -1623,7 +1623,7 @@ export default function HeroPage() {
                 </div>
 
                 <div className="flex flex-col gap-4 lg:hidden">
-                  <div style={{ padding: 10, background: "#1a0f0a", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
+                  <div style={{ padding: 10, background: "#3d1010", borderRadius: 18, boxShadow: "6px 8px 22px rgba(0,0,0,0.7), -3px -3px 10px rgba(0,0,0,0.3)" }}>
                     <div style={{ position: "relative", width: "100%", aspectRatio: "661 / 896", borderRadius: 8, overflow: "hidden", background: "#0f0808" }}>
                       <div style={{ position: "absolute", top: "5.46%", right: "12.52%", bottom: "53.88%", left: "10.04%" }}><img src="/images/infosys/photo1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                       <div style={{ position: "absolute", top: "38.36%", right: "54.29%", bottom: "29.29%", left: "13.1%" }}><img src="/images/infosys/photo2.png" alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
@@ -1635,7 +1635,7 @@ export default function HeroPage() {
                       <div style={{ position: "absolute", bottom: "2%", left: 0, right: 0, textAlign: "center", fontFamily: "monospace", fontSize: 8, letterSpacing: "0.13em", color: "rgba(250,240,220,0.22)", textTransform: "uppercase" }}>INFOSYS LIMITED</div>
                     </div>
                   </div>
-                  <div style={{ background: "#2a1510", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
+                  <div style={{ background: "#3d1010", borderRadius: 14, padding: 18, boxShadow: "2px 4px 18px rgba(0,0,0,0.3)" }}>
                     <div style={{ fontFamily: "var(--font-playfair),'Playfair Display',serif", fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 3 }}>Technology Analyst</div>
                     <div style={{ fontSize: 12, fontWeight: 500, color: "#C9973E", marginBottom: 10 }}>Infosys Limited · 2019–2023</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10, flexWrap: "wrap" }}>
